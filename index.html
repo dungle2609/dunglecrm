@@ -1,3 +1,6 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Consulting Sales Journey</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -396,6 +399,7 @@ const IC={
   chev:'<path d="M9 6l6 6-6 6"/>', upc:'<path d="M6 15l6-6 6 6"/>', downc:'<path d="M6 9l6 6 6-6"/>', plus:'<path d="M12 5v14M5 12h14"/>',
   down:'<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>', up:'<path d="M12 20V9M7 14l5-5 5 5M5 4h14"/>',
   pause:'<path d="M9 6v12M15 6v12"/>',
+  cloud:'<path d="M7.5 18.5h9.5a4 4 0 0 0 .4-8 5.5 5.5 0 0 0-10.6 1.2 3.4 3.4 0 0 0 .7 6.8z"/>',
   trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>'
 };
 const ic=n=>'<svg class="i" viewBox="0 0 24 24" aria-hidden="true">'+IC[n]+'</svg>';
@@ -433,18 +437,20 @@ const prevOf=s=>ORDER[IDX[s.id]-1];
 function norm(d){if(!Array.isArray(d.todos))d.todos=[];return d}
 
 /* ---------- Trạng thái + lưu trữ ---------- */
+// S.mode: 'cloud' = kho db của artifact claude.ai · 'fb' = đồng bộ real-time qua Firebase (bản chạy ngoài claude.ai) · 'local' = chỉ trình duyệt này
 const S={mode:'init',db:null,dl:null,loaded:false,deals:{},tab:LS.get('cj.tab')||'',q:'',open:null,ui:{},sync:'idle',logOpen:LS.get('cj.log')!=='0',dragId:null};
 const cur=()=>S.deals[S.open];
 function addLog(d,k,x){d.log=d.log||[];d.log.push({t:Date.now(),k:k,x:x,st:d.stage});if(d.log.length>300)d.log=d.log.slice(-300)}
 const dirty=new Set(),timers={},inflight={},again={};
 function setSync(s){S.sync=s;const el=$('#sync');if(!el)return;el.className='sync '+(S.mode==='local'?'':s);
-  el.title=S.mode==='local'?'Đang lưu trên trình duyệt này':({ok:'Đã lưu',busy:'Đang lưu…',err:'Chưa lưu được',idle:'Đã kết nối'}[s]||'')}
+  el.title=S.mode==='local'?'Đang lưu trên trình duyệt này':S.mode==='fb'?fbTitle(s):({ok:'Đã lưu',busy:'Đang lưu…',err:'Chưa lưu được',idle:'Đã kết nối'}[s]||'')}
 function saveLocal(){LS.set('cj.v1',JSON.stringify({deals:S.deals,cfg:CFG}))}
 function loadLocal(){try{const o=JSON.parse(LS.get('cj.v1')||'{}');S.deals=o.deals||{};if(o.cfg)applyCfg(o.cfg)}catch(e){S.deals={}}
   Object.values(S.deals).forEach(norm)}
-function save(id,delay){const d=S.deals[id];if(d)d.updated=Date.now();dirty.add(id);clearTimeout(timers[id]);timers[id]=setTimeout(()=>flush(id),delay==null?500:delay)}
+function save(id,delay){const d=S.deals[id];if(d)d.updated=Date.now();dirty.add(id);if(S.mode==='fb')fbPend(id,true);clearTimeout(timers[id]);timers[id]=setTimeout(()=>flush(id),delay==null?500:delay)}
 async function writeDoc(id){
   const d=S.deals[id];
+  if(S.mode==='fb'){fbPend(id,true);saveLocal();await fbWrite('deals/'+id,d?fbRec(d,d.updated):null);if(!again[id])fbPend(id,false);return}
   if(S.mode!=='cloud'){saveLocal();return}
   const ref=S.db.doc('deals/'+id);
   try{d?await ref.set(clone(d)):await ref.delete()}
@@ -454,11 +460,15 @@ async function flush(id){
   if(inflight[id]){again[id]=true;return}
   inflight[id]=true;setSync('busy');
   try{await writeDoc(id);setSync('ok')}
-  catch(e){setSync('err');toast(e&&e.code==='quota_exceeded'?'Kho dữ liệu đã đầy. Xoá bớt deal cũ rồi thử lại.':'Chưa lưu được thay đổi. Kiểm tra mạng rồi sửa lại một lần nữa.')}
+  catch(e){if(S.mode==='fb')fbFail(e);else{setSync('err');toast(e&&e.code==='quota_exceeded'?'Kho dữ liệu đã đầy. Xoá bớt deal cũ rồi thử lại.':'Chưa lưu được thay đổi. Kiểm tra mạng rồi sửa lại một lần nữa.')}}
   inflight[id]=false;
   if(again[id]){again[id]=false;flush(id)}else dirty.delete(id);
 }
 async function saveMeta(name,obj){
+  if(S.mode==='fb'){
+    saveLocal();FB.meta[name]=1;fbSave();setSync('busy');
+    try{await fbWrite('meta/'+name,fbRec(obj));delete FB.meta[name];fbSave();setSync('ok')}catch(e){fbFail(e)}
+    return}
   if(S.mode!=='cloud'){saveLocal();return}
   setSync('busy');
   try{await S.db.doc('meta/'+name).set(clone(obj));setSync('ok')}catch(e){setSync('err');toast('Chưa lưu được. Thử lại sau.')}
@@ -474,6 +484,119 @@ function subscribe(){
   },()=>{setSync('err');toast('Mất kết nối với dữ liệu. Tải lại trang để thử lại.')});
   S.db.doc('meta/config').onSnapshot(s=>{if(s.exists){applyCfg(clone(s.data()));if(S.loaded)afterData()}},()=>{});
 }
+
+/* ---------- Đồng bộ real-time qua Firebase Realtime Database ----------
+   Dùng khi app chạy ngoài claude.ai (VD GitHub Pages) vì khung artifact chặn mọi kết nối ra ngoài.
+   Nói chuyện bằng REST + EventSource, không cần thư viện. Mọi máy nhập cùng một mã đồng bộ thì dùng chung một bản dữ liệu:
+     csj/<mã>/deals/<id>   = {s: JSON của deal, t: lúc sửa, dev: máy sửa}
+     csj/<mã>/meta/config  = {s: JSON của phễu, t, dev}
+   Lưu dạng chuỗi JSON để Firebase không làm rơi mảng rỗng hay đổi mảng thành object.
+   Luật bảo mật nằm ở database.rules.json: chỉ đọc/ghi được khi biết mã (≥16 ký tự), không ai liệt kê được các mã.
+   Mã giống mật khẩu: gõ tay trên từng máy, không ghi vào code (code công khai trên GitHub).
+   Trình duyệt vẫn giữ một bản sao (cj.v1) nên mở app khi mất mạng vẫn thấy deal; sửa lúc mất mạng thì nằm trong FB.pend, có mạng lại sẽ tự gửi. */
+const FB_DB='https://consulting-sales-journey-default-rtdb.asia-southeast1.firebasedatabase.app';
+const IN_CLAUDE=!!(window.claude&&typeof window.claude.use==='function')||/\.claudeusercontent\.com$/.test(location.hostname);
+const CODE_OK=/^[A-Za-z0-9_-]{16,128}$/;
+// FB.code: mã đồng bộ · FB.dev: mã của máy này · FB.pend: id deal đã sửa trên máy này mà chưa gửi lên được · FB.meta: phễu chưa gửi lên được · FB.join: lần nối đầu tiên với mã này, cần gộp dữ liệu hai bên
+const FB=(()=>{let o=null;try{o=JSON.parse(LS.get('cj.sync')||'null')}catch(e){}o=o&&typeof o==='object'?o:{};
+  if(!o.dev)o.dev=uid();if(!Array.isArray(o.pend))o.pend=[];if(!o.meta||typeof o.meta!=='object')o.meta={};return o})();
+let fbES=null,fbGen=0,fbRetryT=0,fbConT=0,fbWarned=false,fbAt=0,fbMsg='';
+function fbSave(){LS.set('cj.sync',JSON.stringify({code:FB.code||null,dev:FB.dev,pend:FB.pend,meta:FB.meta,join:!!FB.join}))}
+function fbPend(id,on){const i=FB.pend.indexOf(id);if(on&&i<0)FB.pend.push(id);else if(!on&&i>=0)FB.pend.splice(i,1);else return;fbSave()}
+const fbURL=p=>FB_DB+'/csj/'+encodeURIComponent(FB.code)+(p?'/'+p:'')+'.json';
+const fbRec=(o,t)=>({s:JSON.stringify(o),t:t||Date.now(),dev:FB.dev});
+const fbParse=r=>{try{return r&&typeof r.s==='string'?JSON.parse(r.s):null}catch(e){return null}};
+const hhmm=t=>{const d=new Date(t);return pad(d.getHours())+':'+pad(d.getMinutes())};
+function fbTitle(s){return s==='ok'?'Đã đồng bộ Firebase'+(fbAt?' lúc '+hhmm(fbAt):''):s==='busy'?'Đang gửi lên Firebase…':s==='err'?(fbMsg||'Chưa đồng bộ được'):'Đang kết nối Firebase…'}
+async function fbWrite(path,val){
+  let r;
+  try{r=await fetch(fbURL(path),val==null?{method:'DELETE',cache:'no-store'}:{method:'PUT',body:JSON.stringify(val),cache:'no-store'})}
+  catch(e){throw {code:'offline'}}
+  if(!r.ok)throw {code:r.status===401||r.status===403?'denied':'http',status:r.status};
+  fbAt=Date.now();fbMsg='';fbWarned=false;
+}
+function fbFail(e){
+  fbMsg=e&&e.code==='denied'?'Firebase từ chối ghi. Kiểm tra lại mã đồng bộ.':'Mất kết nối Firebase. Thay đổi vẫn nằm trên máy này và sẽ tự gửi khi có mạng.';
+  setSync('err');if(!fbWarned){fbWarned=true;toast(fbMsg)}
+  clearTimeout(fbRetryT);fbRetryT=setTimeout(fbRetry,15000);
+}
+// gửi lại mọi thứ chưa lên được
+function fbRetry(){
+  if(S.mode!=='fb')return;
+  clearTimeout(fbRetryT);
+  FB.pend.slice().forEach(id=>flush(id));
+  if(FB.meta.config)saveMeta('config',CFG);
+}
+function fbDone(){S.loaded=true;fbAt=Date.now();fbMsg='';saveLocal();setSync(FB.pend.length||FB.meta.config?'busy':'ok');afterData()}
+// Toàn bộ bản trên mây → màn hình. Deal đang sửa dở hoặc chưa gửi được thì giữ bản trên máy.
+function fbApplyAll(data){
+  data=data||{};const rd=data.deals||{},rm=data.meta||{};
+  if(FB.join){fbJoin(rd,rm);return}
+  const next={};
+  Object.keys(rd).forEach(id=>{const d=fbParse(rd[id]);if(d)next[id]=norm(d)});
+  new Set([...dirty,...FB.pend]).forEach(id=>{if(S.deals[id])next[id]=S.deals[id];else delete next[id]});
+  S.deals=next;
+  if(rm.config&&!FB.meta.config){const c=fbParse(rm.config);if(c)applyCfg(c)}
+  fbDone();
+  if(FB.pend.length||FB.meta.config)fbRetry();
+}
+// Một deal đổi trên mây (máy khác vừa sửa, hoặc tiếng vọng của chính máy này)
+function fbApplyDeal(id,rec){
+  if(dirty.has(id)||FB.pend.includes(id))return;
+  const loc=S.deals[id];
+  if(rec&&rec.dev===FB.dev&&loc&&(rec.t||0)<(loc.updated||0))return;
+  if(!rec){if(!loc)return;delete S.deals[id]}
+  else{const d=fbParse(rec);if(!d)return;S.deals[id]=norm(d)}
+  fbDone();
+}
+// Lần nối đầu với một mã trên máy này: gộp hai bên, deal nào sửa sau thì giữ bản đó; phễu lấy bản trên mây nếu đã có
+function fbJoin(rd,rm){
+  const next={};let up=0;
+  Object.keys(rd).forEach(id=>{const d=fbParse(rd[id]);if(d)next[id]=norm(d)});
+  Object.keys(S.deals).forEach(id=>{const l=S.deals[id],r=next[id];if(!r||(l.updated||0)>(r.updated||0)){next[id]=l;if(FB.pend.indexOf(id)<0)FB.pend.push(id);up++}});
+  S.deals=next;
+  const c=fbParse(rm.config);if(c)applyCfg(c);else FB.meta.config=1;
+  FB.join=false;fbSave();fbDone();fbRetry();
+  toast('Đã bật đồng bộ: '+Object.keys(next).length+' deal'+(up?', trong đó '+up+' deal từ máy này được đưa lên':''));
+}
+async function fbRefetch(gen){
+  try{const r=await fetch(fbURL(''),{cache:'no-store'});if(!r.ok||gen!==fbGen)return;fbApplyAll(await r.json())}catch(e){}
+}
+// Luồng real-time: Firebase đẩy sự kiện put/patch mỗi khi dữ liệu dưới csj/<mã> đổi
+function fbConnect(){
+  const gen=++fbGen;clearTimeout(fbConT);
+  if(fbES){fbES.close();fbES=null}
+  if(S.mode!=='fb'||!FB.code)return;
+  if(S.sync!=='err')setSync('idle');
+  const es=new EventSource(fbURL(''));fbES=es;
+  const apply=(m,patch)=>{
+    if(!m||typeof m.path!=='string')return;
+    const seg=m.path.split('/').filter(Boolean);
+    if(!seg.length){if(patch)fbRefetch(gen);else fbApplyAll(m.data);return}
+    if(seg[0]==='deals'&&seg.length===1&&patch){Object.keys(m.data||{}).forEach(id=>fbApplyDeal(id,m.data[id]));return}
+    if(seg[0]==='deals'&&seg.length===2&&!patch){fbApplyDeal(seg[1],m.data);return}
+    if(seg[0]==='meta'&&seg[1]==='config'&&seg.length===2&&!patch){const c=fbParse(m.data);if(c&&!FB.meta.config){applyCfg(c);fbDone()}return}
+    fbRefetch(gen);
+  };
+  const on=(type,fn)=>es.addEventListener(type,e=>{if(gen!==fbGen)return;let m=null;try{m=JSON.parse(e.data)}catch(_){}fn(m)});
+  on('put',m=>apply(m,false));
+  on('patch',m=>apply(m,true));
+  on('cancel',()=>{es.close();fbMsg='Firebase từ chối đọc. Kiểm tra lại mã đồng bộ.';setSync('err');toast(fbMsg)});
+  es.onerror=()=>{
+    if(gen!==fbGen)return;
+    fbMsg='Mất kết nối Firebase. Đang thử kết nối lại…';setSync('err');
+    if(es.readyState===2)fbConT=setTimeout(()=>{if(gen===fbGen)fbConnect()},15000);
+  };
+}
+function fbStart(){S.mode='fb';fbConnect()}
+function fbEnable(code){FB.code=code;FB.join=true;FB.pend=[];FB.meta={};fbWarned=false;fbSave();S.mode='fb';setSync('idle');fbConnect()}
+function fbDisable(){
+  fbGen++;clearTimeout(fbRetryT);clearTimeout(fbConT);if(fbES){fbES.close();fbES=null}
+  FB.code=null;FB.join=false;FB.pend=[];FB.meta={};fbSave();S.mode='local';saveLocal();setSync('ok');
+}
+window.addEventListener('online',()=>{if(S.mode!=='fb')return;if(!fbES||fbES.readyState===2)fbConnect();fbRetry()});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&S.mode==='fb'&&(!fbES||fbES.readyState===2))fbConnect()});
+
 async function init(){
   let db=null;
   if(window.claude&&typeof window.claude.use==='function'){
@@ -481,7 +604,7 @@ async function init(){
     try{db=await window.claude.use('db')}catch(e){db=null}
   }
   if(db){S.mode='cloud';S.db=db;setSync('idle');subscribe()}
-  else{S.mode='local';loadLocal();S.loaded=true;setSync('ok');renderMain()}
+  else{S.mode='local';loadLocal();S.loaded=true;if(!IN_CLAUDE&&FB.code)fbStart();else setSync('ok');renderMain()}
 }
 
 /* ---------- Thanh trên + tab ---------- */
@@ -860,6 +983,7 @@ function openHMenu(btn){
   const r=btn.getBoundingClientRect(),hasSample=Object.values(S.deals).some(d=>d.sample);
   hm.innerHTML='<div class="menu" style="top:'+(r.bottom+6)+'px;right:'+Math.max(8,innerWidth-r.right)+'px">'
     +'<button data-hact="editor">'+ic('sliders')+'Chỉnh phễu</button><hr>'
+    +(IN_CLAUDE?'':'<button data-hact="sync">'+ic('cloud')+'Đồng bộ Firebase</button>')
     +'<button data-hact="backup">'+ic('down')+'Sao lưu dữ liệu</button><button data-hact="import">'+ic('up')+'Nhập bản sao lưu</button>'
     +(hasSample?'<hr><button class="danger" data-hact="clearSample">'+ic('trash')+'Xoá deal mẫu</button>':'')+'</div>';
 }
@@ -880,6 +1004,30 @@ $('#imp').addEventListener('change',async e=>{
     if(!mine||(inc.updated||0)>(mine.updated||0)){S.deals[id]=inc;dirty.add(id);try{await flush(id)}catch(err){}n++}}
   renderMain();toast(n?'Đã gộp '+n+' deal từ bản sao lưu':'Không có gì mới trong bản sao lưu');
 });
+function newCode(){const a='abcdefghijkmnpqrstuvwxyz23456789',b=crypto.getRandomValues(new Uint8Array(20));return Array.from(b,(x,i)=>(i&&i%5===0?'-':'')+a[x%32]).join('')}
+function openSync(){
+  if(FB.code){
+    modal('<div class="m-h"><span class="m-t">Đồng bộ Firebase</span>'+xBtn+'</div><p class="m-p">'+esc(fbTitle(S.sync))+'</p>'
+      +'<div class="f"><label for="sy-code">Mã đồng bộ</label><input class="fld" id="sy-code" readonly value="'+esc(FB.code)+'"></div>'
+      +'<p class="hint">Nhập đúng mã này trên máy khác để dùng chung dữ liệu. Giữ mã như mật khẩu: ai có mã là xem và sửa được toàn bộ deal.</p>'
+      +'<div class="m-act"><button type="button" class="btn ghost" id="sy-off">Tắt đồng bộ trên máy này</button><button type="button" class="btn pri" data-x>Xong</button></div>');
+    $('#sy-code').addEventListener('focus',e=>e.target.select());
+    $('#sy-off').addEventListener('click',()=>{fbDisable();closeModal();toast('Đã tắt đồng bộ. Deal vẫn còn trên máy này.')});
+    return;
+  }
+  modal('<div class="m-h"><span class="m-t">Đồng bộ Firebase</span>'+xBtn+'</div><p class="m-p">Lưu deal lên Firebase và cập nhật tức thì giữa các máy đang mở app. Mọi máy dùng chung một mã đồng bộ.</p>'
+    +'<div class="f"><label for="sy-code">Mã đồng bộ</label><input class="fld" id="sy-code" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Dán mã từ máy khác, hoặc bấm Tạo mã mới">'
+    +'<p class="hint" id="sy-hint">Ít nhất 16 ký tự, gồm chữ không dấu, số, dấu - hoặc _. Giữ mã như mật khẩu.</p></div>'
+    +'<div class="m-act"><button type="button" class="btn ghost" id="sy-gen">Tạo mã mới</button><button type="button" class="btn pri" id="sy-on">Bật đồng bộ</button></div>');
+  const inp=$('#sy-code'),hint=$('#sy-hint');
+  $('#sy-gen').addEventListener('click',()=>{inp.value=newCode();hint.textContent='Lưu mã này lại (VD trong Ghi chú) để nhập trên máy khác.';hint.classList.remove('err');inp.focus();inp.select()});
+  $('#sy-on').addEventListener('click',()=>{
+    const code=inp.value.trim();
+    if(!CODE_OK.test(code)){hint.textContent='Mã cần ít nhất 16 ký tự, chỉ gồm chữ không dấu, số, dấu - hoặc _.';hint.classList.add('err');inp.focus();return}
+    closeModal();fbEnable(code);
+  });
+  setTimeout(()=>inp.focus(),30);
+}
 async function clearSample(){
   const ids=Object.keys(S.deals).filter(id=>S.deals[id].sample);
   for(const id of ids){delete S.deals[id];dirty.add(id);try{await flush(id)}catch(e){}}
@@ -895,6 +1043,7 @@ document.addEventListener('click',e=>{
   if(a==='menu')openHMenu(b);
   else if(a==='new')openNew();
   else if(a==='editor')openEditor();
+  else if(a==='sync')openSync();
   else if(a==='backup')backup();
   else if(a==='import')$('#imp').click();
   else if(a==='clearSample')clearSample();
