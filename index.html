@@ -1,0 +1,925 @@
+<title>Consulting Sales Journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: thanh trên → tab theo phase → các làn stage chạy hết chiều cao (xếp chồng trên điện thoại) → ngăn deal bên phải */
+:root{
+  --bg:#F3F5F8; --surface:#FFFFFF; --surface-2:#EAEEF3; --lane:#E6EAF0; --card:#FFFFFF;
+  --ink:#151D2C; --ink-2:#465063; --muted:#7D879A; --line:#DCE1E8; --line-2:#C2C9D5;
+  --ring:rgba(37,99,235,.35); --busy:#2563EB; --btn:#151D2C; --on-btn:#FFFFFF; --on-accent:#FFFFFF;
+  --danger:#C62A1E; --danger-bg:#FBE9E7; --warn:#A86200; --warn-bg:#FBF0DD; --ok:#2F8A4E; --ok-bg:#E3F2E8;
+  --c0:#0B8A8F; --c0-bg:#E1F2F2; --c1:#C47400; --c1-bg:#FAEEDC; --c2:#6E56CF; --c2-bg:#ECE8FA; --c3:#2F8A4E; --c3-bg:#E3F2E8;
+  --c4:#2563EB; --c4-bg:#E4ECFD; --c5:#C2385A; --c5-bg:#FBE6EC; --c6:#8A6A4C; --c6-bg:#F2ECE5; --c7:#56657E; --c7-bg:#E9EDF3;
+  --lost:#7D879A; --lost-bg:#EAEEF3; --scrim:rgba(14,19,27,.32);
+  --shadow:0 1px 2px rgba(21,29,44,.06),0 10px 28px rgba(21,29,44,.10);
+  --font:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E131B; --surface:#161D28; --surface-2:#1D2634; --lane:#131A24; --card:#1C2532;
+    --ink:#E7EBF2; --ink-2:#B0B9C9; --muted:#7A8497; --line:#252F40; --line-2:#354257;
+    --ring:rgba(106,165,255,.45); --busy:#6AA5FF; --btn:#E7EBF2; --on-btn:#0E131B; --on-accent:#0E131B;
+    --danger:#FF7A6E; --danger-bg:#3A1C1A; --warn:#F2B441; --warn-bg:#33270F; --ok:#6FCF97; --ok-bg:#15301F;
+    --c0:#45C7C9; --c0-bg:#10292C; --c1:#F2B441; --c1-bg:#2E2412; --c2:#B4A5F5; --c2-bg:#231E3A; --c3:#6FCF97; --c3-bg:#14301F;
+    --c4:#6AA5FF; --c4-bg:#13233F; --c5:#F28BA5; --c5-bg:#3A1822; --c6:#CDB294; --c6-bg:#2B241C; --c7:#9AA8BD; --c7-bg:#1E2633;
+    --lost:#7A8497; --lost-bg:#1D2634; --scrim:rgba(0,0,0,.5);
+    --shadow:0 1px 2px rgba(0,0,0,.35),0 12px 32px rgba(0,0,0,.45);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E131B; --surface:#161D28; --surface-2:#1D2634; --lane:#131A24; --card:#1C2532;
+  --ink:#E7EBF2; --ink-2:#B0B9C9; --muted:#7A8497; --line:#252F40; --line-2:#354257;
+  --ring:rgba(106,165,255,.45); --busy:#6AA5FF; --btn:#E7EBF2; --on-btn:#0E131B; --on-accent:#0E131B;
+  --danger:#FF7A6E; --danger-bg:#3A1C1A; --warn:#F2B441; --warn-bg:#33270F; --ok:#6FCF97; --ok-bg:#15301F;
+  --c0:#45C7C9; --c0-bg:#10292C; --c1:#F2B441; --c1-bg:#2E2412; --c2:#B4A5F5; --c2-bg:#231E3A; --c3:#6FCF97; --c3-bg:#14301F;
+  --c4:#6AA5FF; --c4-bg:#13233F; --c5:#F28BA5; --c5-bg:#3A1822; --c6:#CDB294; --c6-bg:#2B241C; --c7:#9AA8BD; --c7-bg:#1E2633;
+  --lost:#7A8497; --lost-bg:#1D2634; --scrim:rgba(0,0,0,.5);
+  --shadow:0 1px 2px rgba(0,0,0,.35),0 12px 32px rgba(0,0,0,.45);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%;background:var(--bg)}
+body{margin:0;color:var(--ink);font-family:var(--font);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer}
+button:disabled{opacity:.35;cursor:default}
+input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--ring);outline-offset:2px}
+svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.sp{flex:1}
+.app{display:flex;flex-direction:column;height:100%}
+
+/* thanh trên */
+.top{display:flex;align-items:center;gap:8px;height:56px;padding:0 16px;flex:none}
+.brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:17px;letter-spacing:-.01em;white-space:nowrap;min-width:0}
+.brand svg{color:var(--ink-2)}
+.bt{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.top .btn,.top .ib{flex:none}
+.sync{width:7px;height:7px;border-radius:50%;background:var(--muted);flex:none}
+.sync.ok{background:var(--ok)} .sync.busy{background:var(--busy)} .sync.err{background:var(--danger)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:34px;padding:0 12px;border-radius:8px;font-weight:600;font-size:13.5px;white-space:nowrap}
+.btn.pri{background:var(--btn);color:var(--on-btn)}
+.btn.ghost{border:1px solid var(--line-2);background:var(--surface)}
+.btn.ghost:hover{border-color:var(--ink-2)}
+.btn.danger{background:var(--danger);color:var(--on-accent)}
+.btn.sm{height:28px;padding:0 10px;font-size:12.5px}
+.ib{width:34px;height:34px;display:inline-grid;place-items:center;border-radius:8px;color:var(--ink-2);flex:none}
+.ib:hover:not(:disabled){background:var(--surface-2);color:var(--ink)}
+.ib.xs{width:26px;height:26px;border-radius:6px}
+.ib.xs svg{width:15px;height:15px}
+.link{font-size:13px;color:var(--ink-2);padding:6px 4px;display:inline-flex;align-items:center;gap:5px}
+.link:hover{color:var(--ink)}
+.link svg{width:16px;height:16px}
+.mini{font-size:12.5px;color:var(--ink-2);padding:2px 6px;border-radius:6px;letter-spacing:0;text-transform:none;font-weight:500;white-space:nowrap}
+.mini:hover{background:var(--surface-2);color:var(--ink)}
+
+/* tab phase */
+.tabs{display:flex;align-items:center;gap:8px;padding:0 16px;border-bottom:1px solid var(--line);flex:none}
+.tablist{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;min-width:0}
+.tablist::-webkit-scrollbar{display:none}
+.tab{position:relative;display:flex;align-items:center;gap:6px;height:40px;padding:0 10px;color:var(--ink-2);font-weight:500;white-space:nowrap}
+.tab:hover{color:var(--ink)}
+.tab .n{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.tab.on{color:var(--ink);font-weight:600}
+.tab.on::after{content:"";position:absolute;left:10px;right:10px;bottom:-1px;height:2px;border-radius:2px;background:var(--pc)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--pc);flex:none}
+.search{display:flex;align-items:center;gap:6px;height:32px;padding:0 10px;border-radius:8px;background:var(--surface);border:1px solid var(--line);color:var(--muted);flex:none}
+.search:focus-within{border-color:var(--line-2)}
+.search input{border:0;background:none;outline:none;width:160px;color:var(--ink);min-width:0}
+
+/* bảng: mỗi stage là một làn */
+.board{flex:1;min-height:0;display:flex;flex-direction:column;padding:0 16px 14px}
+.phase{display:flex;align-items:center;gap:8px;padding:10px 0;font-size:13px;color:var(--ink-2);flex:none}
+.phase b{color:var(--ink);font-weight:600}
+.cols{flex:1;min-height:0;display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;padding-bottom:6px}
+.col{width:276px;flex:none;display:flex;flex-direction:column;min-height:0;background:var(--lane);border-radius:10px;border-top:3px solid var(--pc)}
+.col-h{display:flex;align-items:center;gap:6px;padding:10px 10px 8px 12px;flex:none}
+.col-t{font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.col-n{margin-left:auto;font-size:12px;color:var(--ink-2);font-variant-numeric:tabular-nums;background:var(--card);padding:0 8px;border-radius:999px;flex:none}
+.col-body{flex:1;min-height:0;overflow-y:auto;padding:2px 8px 10px;display:flex;flex-direction:column;gap:8px}
+.col.drop{box-shadow:inset 0 0 0 2px var(--pc)}
+.col-empty{color:var(--muted);font-size:12.5px;text-align:center;padding:16px 6px}
+.list{flex:1;min-height:0;overflow:auto}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.sub-h{padding:12px 0 10px;color:var(--ink-2);font-size:13px}
+
+.card{display:flex;flex-direction:column;gap:3px;padding:10px 12px;border-radius:8px;background:var(--card);border:1px solid var(--line);cursor:pointer;transition:border-color .15s,box-shadow .15s;user-select:none;-webkit-user-select:none}
+.card:hover{border-color:var(--line-2);box-shadow:var(--shadow)}
+.card.sel{border-color:var(--pc);box-shadow:0 0 0 1px var(--pc)}
+.card.held{opacity:.72}
+.card.dragging{opacity:.4}
+.c-top{display:flex;gap:8px;align-items:baseline;min-width:0}
+.c-name{font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.c-who{font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.c-todo{display:flex;gap:7px;align-items:center;font-size:12.5px;color:var(--ink-2);min-width:0}
+.c-todo i{width:10px;height:10px;border:1.5px solid var(--line-2);border-radius:3px;flex:none}
+.c-todo span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.c-foot{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:2px}
+.tag{font-size:11px;font-weight:600;padding:1px 6px;border-radius:5px;white-space:nowrap}
+.tag.hold{background:var(--warn-bg);color:var(--warn)}
+.tag.plain{background:var(--surface-2);color:var(--muted)}
+
+/* nút (i) và bảng ghi chú */
+.ii{width:22px;height:22px;display:inline-grid;place-items:center;border-radius:50%;color:var(--muted);flex:none}
+.ii:hover,.ii.on{color:var(--ink);background:var(--surface-2)}
+.col .ii:hover,.col .ii.on{background:var(--card)}
+.ii svg{width:16px;height:16px}
+.tipbox{position:fixed;z-index:60;width:max-content;max-width:min(340px,calc(100vw - 24px));background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:12px 14px;font-size:13px;line-height:1.45;pointer-events:none}
+.tip-k{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.tip-v{margin-bottom:10px}
+.tip-v:last-child{margin-bottom:0}
+.tipbox ol,.tipbox ul{margin:0;padding-left:18px;color:var(--ink-2)}
+.tipbox li+li{margin-top:2px}
+.tipbox .muted{color:var(--muted)}
+
+/* ngăn deal */
+#drawer-root{position:fixed;inset:0;z-index:20}
+.scrim{position:absolute;inset:0;background:var(--scrim)}
+.drawer{position:absolute;top:0;right:0;bottom:0;width:min(480px,100%);background:var(--surface);box-shadow:var(--shadow);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.drawer.enter{animation:slide .18s ease-out}
+@keyframes slide{from{transform:translateX(20px);opacity:.6}}
+.d-top{position:relative;display:flex;align-items:center;gap:4px;padding:10px;border-bottom:1px solid var(--line);flex:none}
+.d-name{flex:1;min-width:0;border:0;background:none;font-size:17px;font-weight:700;padding:4px 6px;border-radius:6px}
+.d-name:hover,.d-name:focus{background:var(--surface-2);outline:none}
+.lostbtn{height:30px;padding:0 10px;border-radius:7px;border:1px solid var(--line-2);font-size:12.5px;font-weight:600;color:var(--danger);flex:none}
+.lostbtn:hover{border-color:var(--danger)}
+.d-body{flex:1;overflow:auto;padding:16px 18px 32px;display:flex;flex-direction:column;gap:18px}
+.fld{width:100%;min-width:0;height:32px;padding:0 9px;border:1px solid transparent;border-radius:6px;background:var(--surface-2);color:var(--ink)}
+.fld:focus{border-color:var(--line-2);background:var(--surface);outline:none}
+.fld::placeholder{color:var(--muted)}
+textarea.fld{height:auto;min-height:60px;padding:7px 9px;resize:vertical;line-height:1.45;display:block}
+.row{display:flex;gap:8px;align-items:center;min-width:0}
+.phases{display:flex;gap:4px;flex-wrap:wrap}
+.ph{padding:3px 10px;border-radius:999px;color:var(--muted);border:1px solid var(--line);font-size:12.5px}
+.ph:hover:not(:disabled){border-color:var(--line-2);color:var(--ink-2)}
+.ph.done{color:var(--ink-2)}
+.ph.on{color:var(--pc);border-color:var(--pc);background:var(--pbg);font-weight:600}
+.stage{border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:16px}
+.st-k{font-size:11.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--pc)}
+.st-row{display:flex;align-items:center;gap:6px}
+.st-n{margin:0;font-size:19px;font-weight:700;letter-spacing:-.01em;line-height:1.3;text-wrap:balance}
+.blk{display:flex;flex-direction:column}
+.blk-h{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11.5px;font-weight:600;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px;min-height:24px}
+.blk-tools{display:flex;gap:2px;flex-wrap:wrap;justify-content:flex-end}
+.cnt{font-variant-numeric:tabular-nums;letter-spacing:0;font-weight:500;color:var(--muted);font-size:12px}
+.cb{appearance:none;-webkit-appearance:none;width:18px;height:18px;border:1.6px solid var(--line-2);border-radius:5px;flex:none;margin:0;display:grid;place-items:center;cursor:pointer;background:var(--surface)}
+.cb:checked{background:var(--pc);border-color:var(--pc)}
+.cb:checked::after{content:"";width:9px;height:5px;border-left:2px solid var(--on-accent);border-bottom:2px solid var(--on-accent);transform:translate(0,-1px) rotate(-45deg)}
+.todo{display:flex;align-items:flex-start;gap:8px;min-width:0;margin:0 -6px;padding:1px 0 1px 6px;border-radius:6px}
+.todo .cb{margin-top:6px}
+.todo .del{margin-top:2px}
+.todo-t{flex:1;min-width:0;min-height:30px;border:0;background:none;padding:5px 6px;border-radius:6px;color:var(--ink);line-height:1.45;resize:none;overflow:hidden;display:block}
+.todo-t:hover{background:var(--surface-2)}
+.todo-t:focus{outline:none;background:var(--surface-2)}
+.todo-t::placeholder{color:var(--muted)}
+.todo.done .todo-t{color:var(--muted);text-decoration:line-through}
+.todo .del{opacity:0}
+.todo:hover .del,.todo:focus-within .del{opacity:1}
+@media (hover:none){.todo .del{opacity:1}}
+.todo.add .plus{width:18px;text-align:center;color:var(--muted);flex:none;font-size:16px;line-height:30px}
+.donebtn{align-self:flex-start;margin-top:4px}
+.st-act{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.box{display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:10px;font-size:13px}
+.box.warn{background:var(--warn-bg)}
+.box.bad{background:var(--lost-bg)}
+.box.plain{border:1px solid var(--line)}
+.box .row{flex-wrap:wrap}
+.pair{display:grid;grid-template-columns:1fr 148px;gap:8px}
+.sec-tg{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;padding:4px 0}
+.sec-tg:hover{color:var(--ink-2)}
+.sec-tg svg{width:15px;height:15px;transition:transform .15s}
+.sec-tg[aria-expanded="true"] svg{transform:rotate(90deg)}
+.note-in{display:block;width:100%;min-height:60px;resize:vertical;padding:8px 10px;margin-top:8px;border:1px solid transparent;border-radius:8px;background:var(--surface-2);color:var(--ink);line-height:1.45}
+.note-in:focus{outline:none;border-color:var(--line-2);background:var(--surface)}
+.note-bar{display:flex;justify-content:space-between;align-items:center;margin-top:6px;gap:8px}
+.log{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.log-i{display:grid;grid-template-columns:42px 1fr;gap:8px;font-size:13px}
+.log-d{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums;padding-top:1px}
+.log-t{white-space:pre-wrap;overflow-wrap:anywhere;min-width:0}
+.log-i.ph .log-t{color:var(--muted);font-size:12.5px}
+
+.menu{position:fixed;z-index:30;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:6px;display:flex;flex-direction:column;min-width:210px}
+.menu.in{position:absolute;right:10px;top:50px}
+.menu button{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;text-align:left;font-size:13.5px}
+.menu button:hover{background:var(--surface-2)}
+.menu .danger{color:var(--danger)}
+.menu hr{border:0;border-top:1px solid var(--line);margin:4px 2px}
+
+/* hộp thoại */
+.modal-wrap{position:fixed;inset:0;z-index:40;display:grid;place-items:center;background:var(--scrim);padding:16px}
+.modal{width:min(440px,100%);max-height:calc(100% - 32px);overflow:auto;background:var(--surface);border-radius:14px;box-shadow:var(--shadow);padding:18px;display:flex;flex-direction:column;gap:14px}
+.modal.wide{width:min(820px,100%)}
+.m-h{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.m-t{font-size:17px;font-weight:700}
+.m-p{margin:0;color:var(--ink-2)}
+.f{display:flex;flex-direction:column;gap:6px}
+.f>label,.f>.lb{font-size:12.5px;color:var(--ink-2);font-weight:500}
+.f .fld{height:38px}
+.m-act{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.m-foot{position:sticky;bottom:-18px;background:var(--surface);padding:12px 0 2px;border-top:1px solid var(--line)}
+.hint{font-size:12.5px;color:var(--muted);margin:0}
+.hint.err{color:var(--danger)}
+.choice{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.choice button{border:1px solid var(--line-2);border-radius:10px;padding:10px 12px;text-align:left;display:flex;flex-direction:column;gap:2px;min-width:0}
+.choice button b{font-weight:700}
+.choice button span{font-size:12px;color:var(--muted);line-height:1.4}
+.choice button.on{border-color:var(--pc);background:var(--pbg);box-shadow:0 0 0 1px var(--pc)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{height:30px;padding:0 11px;border-radius:999px;border:1px solid var(--line-2);font-size:12.5px;background:var(--surface)}
+.chip.on{background:var(--btn);color:var(--on-btn);border-color:var(--btn)}
+.ed{display:flex;flex-direction:column;gap:16px}
+.ed-ph{border:1px solid var(--line);border-top:3px solid var(--pc);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:12px}
+.ed-ph-h{display:flex;align-items:center;gap:6px}
+.ed-ph-h .fld{font-weight:700;font-size:15px;max-width:260px}
+.ed-grid{display:grid;grid-template-columns:132px 1fr;gap:8px 12px;align-items:start}
+.ed-grid>label,.ed-grid>.lb{font-size:12.5px;color:var(--ink-2);padding-top:6px}
+.ed-sts{display:flex;flex-direction:column;gap:8px}
+.ed-st{border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+.ed-st>summary{display:flex;align-items:center;gap:8px;padding:6px 8px 6px 12px;cursor:pointer;list-style:none;min-width:0}
+.ed-st>summary::-webkit-details-marker{display:none}
+.ed-st-t{font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ed-st[open]>summary{border-bottom:1px solid var(--line)}
+.ed-st .ed-grid{padding:12px}
+.ed-st .hint.err{padding:10px 12px 0}
+.ed .link{align-self:flex-start}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:50;display:flex;gap:14px;align-items:center;padding:10px 14px;border-radius:10px;background:var(--btn);color:var(--on-btn);font-size:13px;box-shadow:var(--shadow);max-width:calc(100% - 32px)}
+.toast button{font-weight:700;color:inherit;text-decoration:underline;flex:none}
+
+@media (max-width:720px){
+  .top{gap:4px}
+  .brand{font-size:16px;gap:6px}
+  .brand svg{display:none}
+  .btn.pri .lb{display:none}
+  .btn.pri{padding:0 10px}
+  .tabs{flex-wrap:wrap;gap:0;padding-bottom:8px}
+  .tablist{width:100%}
+  .search{width:100%;margin-top:4px}
+  .search input{width:100%}
+  .board{display:block;overflow:auto;padding-bottom:28px}
+  .cols{flex-direction:column;overflow:visible;gap:8px}
+  .col{width:100%}
+  .col-body{overflow:visible}
+  .col.is-empty .col-body{display:none}
+  .modal-wrap{place-items:end center;padding:0}
+  .modal{width:100%;max-height:92%;border-radius:14px 14px 0 0;padding-bottom:calc(18px + env(safe-area-inset-bottom,0px))}
+  .ed-grid{grid-template-columns:1fr}
+  .ed-grid>label,.ed-grid>.lb{padding-top:0}
+}
+@media (max-width:420px){.pair{grid-template-columns:1fr}.choice{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><path d="M7 12h3M14 12h6M17 8.5l3.5 3.5-3.5 3.5"/></svg>
+      <span class="bt">Consulting Sales Journey</span><span class="sync" id="sync" title="Đang kết nối"></span>
+    </div>
+    <div class="sp"></div>
+    <button class="btn pri" data-hact="new" title="Thêm deal"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span class="lb">Deal</span></button>
+    <button class="ib" data-hact="menu" aria-label="Menu"><svg class="i" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg></button>
+  </header>
+  <div class="tabs">
+    <div class="tablist" id="tablist" role="tablist"></div>
+    <div class="sp"></div>
+    <label class="search"><svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg><input id="qs" type="search" placeholder="Tìm deal" autocomplete="off" aria-label="Tìm deal"></label>
+  </div>
+  <main class="board" id="board"><p class="sub-h">Đang tải deal…</p></main>
+</div>
+<div id="drawer-root" hidden></div>
+<div id="modal-root"></div>
+<div id="hmenu-root"></div>
+<div id="tip" class="tipbox" role="tooltip" hidden></div>
+<div id="toast" class="toast" role="status" hidden></div>
+<input type="file" id="imp" accept=".json,application/json" hidden>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- Phễu mặc định. Người dùng sửa được trong "Chỉnh phễu"; bản đã sửa lưu ở meta/config ---------- */
+const DEFAULT={v:2,
+ phases:[
+  {id:'pic',name:'PIC',color:0,outcome:'DM tham gia meeting với Base',
+   service:['Hiểu vấn đề của PIC và tìm ra ai là DM','Giúp PIC có thông tin cần, coi bạn là đồng minh','Cùng PIC hẹn được buổi gặp DM']},
+  {id:'dm',name:'DM',color:1,outcome:'DM ra quyết định: ký hợp đồng và thanh toán',
+   service:['Hiểu điều DM đang lo','Giúp DM thấy vấn đề đáng để xử lý','Cho DM thấy Base giải quyết thế nào và giá trị mang lại','Làm rõ chi phí, kế hoạch triển khai, điều khoản','Ký hợp đồng và thu tiền']},
+  {id:'co',name:'Triển khai',color:2,outcome:'Đa số nhân sự thấy hiệu quả và dùng Base lâu dài',
+   service:['Theo sát các buổi triển khai để thấy vướng mắc','Phối hợp xử lý để đạt mốc tiến độ','Nghiệm thu, có báo cáo kết quả']},
+  {id:'net',name:'Quan hệ',color:3,outcome:'Có cơ hội khách hàng mới từ quan hệ',
+   service:['Giữ liên lạc với PIC, champion, DM','Hỏi giới thiệu khách mới','Mời làm case study']}
+ ],
+ stages:[
+  {id:'pic1',phase:'pic',name:'Vấn đề của PIC',outcome:'Biết PIC đang vướng ở đâu khi tìm hiểu phần mềm, và ai là người quyết',
+   service:['Gọi khảo sát sơ bộ','Hỏi PIC được sếp giao hay tự tìm hiểu','Hỏi PIC đang vướng gì khi tìm hiểu','Hỏi lần mua gần nhất ai chốt, qua những bước nào. Đừng đoán DM theo chức danh'],
+   signals:['PIC kể khó khăn bằng ví dụ cụ thể','Biết DM là ai, có căn cứ'],
+   todos:['Gọi khảo sát sơ bộ','Hỏi PIC được giao hay tự tìm hiểu','Hỏi PIC đang vướng gì','Hỏi lần mua gần nhất ai chốt']},
+  {id:'pic2',phase:'pic',name:'Giúp PIC',outcome:'PIC có đủ thông tin cần và coi bạn là đồng minh',
+   service:['Gửi đúng thông tin PIC đang cần','Soạn bản tóm tắt 1 trang để PIC trình sếp','Demo ngắn cho PIC nếu cần. PIC muốn tự trình sếp thì đề nghị đi cùng','Chỉ ra PIC được gì khi đưa sếp vào'],
+   signals:['PIC chủ động hỏi thêm hoặc phản hồi','PIC chia sẻ thông tin nội bộ','PIC đồng ý đưa sếp vào'],
+   todos:['Gửi thông tin PIC đang cần','Soạn bản tóm tắt 1 trang để PIC trình sếp','Demo ngắn cho PIC']},
+  {id:'pic3',phase:'pic',name:'Hẹn DM',outcome:'DM đồng ý gặp Base',
+   service:['Đề xuất buổi 30 phút có cả DM','Nhờ PIC chuyển bản tóm tắt cho sếp','Đổi demo đầy đủ lấy buổi gặp DM','Chưa hẹn được thì lùi về bước trước. Sau 2–3 lần không được thì cân nhắc lost'],
+   signals:['DM xác nhận lịch meeting'],
+   todos:['Đề xuất buổi 30 phút có cả DM','Nhờ PIC chuyển bản tóm tắt cho sếp']},
+  {id:'dm1',phase:'dm',name:'Vấn đề của DM',outcome:'Hiểu DM đang lo gì và vấn đề nằm ở đâu',
+   service:['Phân tích ngành và doanh nghiệp trước buổi gặp','Gửi phiếu khảo sát','Hỏi mục tiêu năm và điều DM đang lo'],
+   signals:['DM tự kể vấn đề bằng ví dụ cụ thể','Có tài liệu hoặc số liệu thật từ phía khách'],
+   todos:['Phân tích ngành và doanh nghiệp','Gửi phiếu khảo sát','Hỏi mục tiêu năm và điều DM đang lo']},
+  {id:'dm2',phase:'dm',name:'Hiểu rõ vấn đề',outcome:'DM thấy vấn đề đáng để xử lý',
+   service:['Meeting trao đổi sâu về vấn đề','Gửi case cùng ngành, bài viết liên quan','Gửi bản chẩn đoán và mức ảnh hưởng của vấn đề','Hỏi mốc thời gian của chính khách. Mốc do bạn gợi ý không tính'],
+   signals:['DM nói ra hậu quả nếu để nguyên','DM đưa ra mốc thời gian vì lý do của họ'],
+   todos:['Meeting trao đổi sâu về vấn đề','Gửi case cùng ngành','Gửi bản chẩn đoán mức ảnh hưởng']},
+  {id:'dm3',phase:'dm',name:'Cách Base giải quyết',outcome:'DM hiểu Base giải quyết vấn đề của họ thế nào',
+   service:['Vẽ bức tranh giải pháp theo bộ phận, quy trình','Showcase theo use-case của khách','Cho dùng thử, chốt tiêu chí thành công trước khi mở'],
+   signals:['Khách chốt phạm vi giai đoạn 1','Khách gửi dữ liệu để dựng demo'],
+   todos:['Vẽ bức tranh giải pháp','Showcase theo use-case của khách','Chốt tiêu chí dùng thử']},
+  {id:'dm4',phase:'dm',name:'Giá trị Base',outcome:'DM thấy giá trị đáng để đầu tư',
+   service:['Gửi proposal riêng cho khách','Lượng hoá giá trị: giờ, tiền, rủi ro','Gửi case cùng ngành, cùng quy mô','Chỉ PIC thích thì chưa đủ, cần chính DM xác nhận'],
+   signals:['DM xác nhận Base là phương án ưu tiên','DM nhắc lại giá trị bằng lời của họ'],
+   todos:['Gửi proposal','Lượng hoá giá trị','Gửi case cùng quy mô']},
+  {id:'dm5',phase:'dm',name:'Chi phí',outcome:'Khách nắm rõ mọi chi phí liên quan',
+   service:['Gửi báo giá','Giải thích từng khoản chi phí','Đề xuất gói và cách thanh toán phù hợp','Khách im lặng sau báo giá: hỏi thẳng khoản nào cần làm rõ'],
+   signals:['Khách phản hồi về con số','Khách hỏi điều kiện thanh toán'],
+   todos:['Gửi báo giá','Giải thích từng khoản chi phí','Đề xuất cách thanh toán']},
+  {id:'dm6',phase:'dm',name:'Kế hoạch triển khai',outcome:'Có kế hoạch triển khai hợp bối cảnh của khách',
+   service:['Lập kế hoạch triển khai theo giai đoạn','Xác định người phụ trách hai bên','Chốt mốc kick-off dự kiến'],
+   signals:['Khách góp ý hoặc duyệt kế hoạch','Khách cử người phụ trách triển khai'],
+   todos:['Lập kế hoạch triển khai','Xác định người phụ trách hai bên','Chốt mốc kick-off']},
+  {id:'dm7',phase:'dm',name:'Ký & thanh toán',outcome:'DM ký hợp đồng và thanh toán',
+   service:['Gửi và giải thích hợp đồng','Đàm phán điều khoản','Làm rõ chính sách thanh toán','Gửi đề nghị thanh toán'],
+   signals:['Hợp đồng đã ký','Tiền đã về'],
+   todos:['Gửi hợp đồng','Đàm phán điều khoản','Gửi đề nghị thanh toán']},
+  {id:'co1',phase:'co',name:'Vướng mắc triển khai',outcome:'Biết triển khai đang vướng ở đâu',
+   service:['Dự hoặc xem recap các buổi triển khai','Hỏi PIC triển khai và người dùng chính'],
+   signals:['Có danh sách vướng mắc cụ thể'],
+   todos:['Xem recap buổi triển khai','Hỏi người dùng chính đang vướng gì']},
+  {id:'co2',phase:'co',name:'Xử lý vướng mắc',outcome:'Triển khai đạt mốc tiến độ',
+   service:['Đề xuất phương án xử lý','Phối hợp bộ phận triển khai','Theo dõi mốc tiến độ'],
+   signals:['Đạt mốc tiến độ đã hẹn','Người dùng dùng đều hằng ngày'],
+   todos:['Đề xuất phương án xử lý','Theo dõi mốc tiến độ']},
+  {id:'co3',phase:'co',name:'Nghiệm thu',outcome:'Go-live toàn công ty, có báo cáo nghiệm thu',
+   service:['Tổng hợp kết quả đã làm được','Họp nghiệm thu với khách'],
+   signals:['Có biên bản hoặc báo cáo nghiệm thu'],
+   todos:['Tổng hợp kết quả','Họp nghiệm thu']},
+  {id:'net1',phase:'net',name:'Giữ quan hệ',outcome:'Có cơ hội khách hàng mới',
+   service:['Giữ liên lạc với PIC, champion, DM','Hỏi giới thiệu khách mới','Mời làm case study'],
+   signals:['Có lời giới thiệu khách mới','Đồng ý làm case study'],
+   todos:['Hỏi giới thiệu khách mới','Mời làm case study']}
+ ]};
+const COLORS=8;
+const LOST=['PIC chỉ đi tìm hiểu','Không tiếp cận được DM','DM chưa thấy cần','Chọn bên khác','Chưa có ngân sách','Không phù hợp','Mất liên lạc','Khác'];
+const DEF_TODO={};DEFAULT.stages.forEach(s=>{DEF_TODO[s.id]=s.todos});
+
+/* ---------- Tiện ích ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const pad=n=>String(n).padStart(2,'0');
+const isoDay=(t=new Date())=>t.getFullYear()+'-'+pad(t.getMonth()+1)+'-'+pad(t.getDate());
+const dmy=iso=>{if(!iso)return'';const p=iso.split('-');return p[2]+'/'+p[1]};
+const dmT=ts=>{const t=new Date(ts);return pad(t.getDate())+'/'+pad(t.getMonth()+1)};
+const days=ts=>ts?Math.max(0,Math.floor((Date.now()-ts)/864e5)):0;
+const fold=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\u0111/g,'d').replace(/\u0110/g,'D').toLowerCase();
+const clone=o=>JSON.parse(JSON.stringify(o));
+const lines=a=>(a||[]).map(x=>String(x).trim()).filter(Boolean);
+const LS={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v);return true}catch(e){return false}}};
+const IC={
+  x:'<path d="M6 6l12 12M18 6L6 18"/>',
+  dots:'<circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.4" fill="currentColor" stroke="none"/>',
+  right:'<path d="M5 12h14M13 6l6 6-6 6"/>', left:'<path d="M19 12H5M11 6l-6 6 6 6"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.7v.1"/>',
+  sliders:'<path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>',
+  chev:'<path d="M9 6l6 6-6 6"/>', upc:'<path d="M6 15l6-6 6 6"/>', downc:'<path d="M6 9l6 6 6-6"/>', plus:'<path d="M12 5v14M5 12h14"/>',
+  down:'<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>', up:'<path d="M12 20V9M7 14l5-5 5 5M5 4h14"/>',
+  pause:'<path d="M9 6v12M15 6v12"/>',
+  trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>'
+};
+const ic=n=>'<svg class="i" viewBox="0 0 24 24" aria-hidden="true">'+IC[n]+'</svg>';
+const infoBtn=(key,label)=>'<button type="button" class="ii" data-info="'+key+'" aria-label="'+esc(label)+'">'+ic('info')+'</button>';
+
+/* ---------- Cấu hình phễu (phase thêm/bớt được) ---------- */
+let CFG=null,ORDER=[],SBY={},IDX={},PH={},PHI={};
+function nextColor(used){for(let i=0;i<COLORS;i++)if(!used.has(i))return i;return used.size%COLORS}
+function fixCfg(c){
+  if(!c||!Array.isArray(c.phases)||!Array.isArray(c.stages))return clone(DEFAULT);
+  c.phases=c.phases.filter(p=>p&&p.id);
+  if(!c.phases.length)return clone(DEFAULT);
+  const LEG={pic:0,dm:1,co:2,net:3},used=new Set();
+  c.phases.forEach(p=>{if(typeof p.color!=='number'||p.color<0||p.color>=COLORS)p.color=(p.id in LEG&&!used.has(LEG[p.id]))?LEG[p.id]:nextColor(used);used.add(p.color);delete p.won});
+  c.v=2;
+  const ids=new Set(c.phases.map(p=>p.id));
+  c.stages=c.stages.filter(s=>s&&s.id&&ids.has(s.phase));
+  c.phases.forEach(p=>{if(!c.stages.some(s=>s.phase===p.id))c.stages.push({id:'s'+uid(),phase:p.id,name:'Bước mới',outcome:'',service:[],signals:[],todos:[]})});
+  c.stages.forEach(s=>{if(!Array.isArray(s.todos))s.todos=(DEF_TODO[s.id]||[]).slice();if(!Array.isArray(s.service))s.service=[];if(!Array.isArray(s.signals))s.signals=[]});
+  return c;
+}
+function applyCfg(c){
+  CFG=fixCfg(c);
+  PH={};PHI={};CFG.phases.forEach((p,i)=>{PH[p.id]=p;PHI[p.id]=i});
+  ORDER=[];CFG.phases.forEach(p=>CFG.stages.forEach(s=>{if(s.phase===p.id)ORDER.push(s)}));
+  SBY={};IDX={};ORDER.forEach((s,i)=>{SBY[s.id]=s;IDX[s.id]=i});
+}
+applyCfg(clone(DEFAULT));
+const pcv=p=>'--pc:var(--c'+(p?p.color:0)+');--pbg:var(--c'+(p?p.color:0)+'-bg)';
+const stageOf=d=>SBY[d.stage]||ORDER[0];
+const phaseOf=d=>PH[stageOf(d).phase];
+const stagesOf=ph=>ORDER.filter(s=>s.phase===ph);
+const nextOf=s=>ORDER[IDX[s.id]+1];
+const prevOf=s=>ORDER[IDX[s.id]-1];
+function norm(d){if(!Array.isArray(d.todos))d.todos=[];return d}
+
+/* ---------- Trạng thái + lưu trữ ---------- */
+const S={mode:'init',db:null,dl:null,loaded:false,deals:{},tab:LS.get('cj.tab')||'',q:'',open:null,ui:{},sync:'idle',logOpen:LS.get('cj.log')!=='0',dragId:null};
+const cur=()=>S.deals[S.open];
+function addLog(d,k,x){d.log=d.log||[];d.log.push({t:Date.now(),k:k,x:x,st:d.stage});if(d.log.length>300)d.log=d.log.slice(-300)}
+const dirty=new Set(),timers={},inflight={},again={};
+function setSync(s){S.sync=s;const el=$('#sync');if(!el)return;el.className='sync '+(S.mode==='local'?'':s);
+  el.title=S.mode==='local'?'Đang lưu trên trình duyệt này':({ok:'Đã lưu',busy:'Đang lưu…',err:'Chưa lưu được',idle:'Đã kết nối'}[s]||'')}
+function saveLocal(){LS.set('cj.v1',JSON.stringify({deals:S.deals,cfg:CFG}))}
+function loadLocal(){try{const o=JSON.parse(LS.get('cj.v1')||'{}');S.deals=o.deals||{};if(o.cfg)applyCfg(o.cfg)}catch(e){S.deals={}}
+  Object.values(S.deals).forEach(norm)}
+function save(id,delay){const d=S.deals[id];if(d)d.updated=Date.now();dirty.add(id);clearTimeout(timers[id]);timers[id]=setTimeout(()=>flush(id),delay==null?500:delay)}
+async function writeDoc(id){
+  const d=S.deals[id];
+  if(S.mode!=='cloud'){saveLocal();return}
+  const ref=S.db.doc('deals/'+id);
+  try{d?await ref.set(clone(d)):await ref.delete()}
+  catch(e){if(e&&e.code==='unavailable'){await new Promise(r=>setTimeout(r,600+Math.random()*600));const d2=S.deals[id];d2?await ref.set(clone(d2)):await ref.delete()}else throw e}
+}
+async function flush(id){
+  if(inflight[id]){again[id]=true;return}
+  inflight[id]=true;setSync('busy');
+  try{await writeDoc(id);setSync('ok')}
+  catch(e){setSync('err');toast(e&&e.code==='quota_exceeded'?'Kho dữ liệu đã đầy. Xoá bớt deal cũ rồi thử lại.':'Chưa lưu được thay đổi. Kiểm tra mạng rồi sửa lại một lần nữa.')}
+  inflight[id]=false;
+  if(again[id]){again[id]=false;flush(id)}else dirty.delete(id);
+}
+async function saveMeta(name,obj){
+  if(S.mode!=='cloud'){saveLocal();return}
+  setSync('busy');
+  try{await S.db.doc('meta/'+name).set(clone(obj));setSync('ok')}catch(e){setSync('err');toast('Chưa lưu được. Thử lại sau.')}
+}
+function afterData(){renderMain();if(S.open){if(!S.deals[S.open])closeDrawer();else if(!drawerBusy())renderDrawer()}}
+function subscribe(){
+  S.db.collection('deals').onSnapshot(snap=>{
+    const next={};
+    snap.docs.forEach(doc=>{next[doc.id]=norm(clone(doc.data()))});
+    dirty.forEach(id=>{if(S.deals[id])next[id]=S.deals[id];else delete next[id]});
+    S.deals=next;S.loaded=true;if(S.sync==='idle')setSync('ok');
+    afterData();
+  },()=>{setSync('err');toast('Mất kết nối với dữ liệu. Tải lại trang để thử lại.')});
+  S.db.doc('meta/config').onSnapshot(s=>{if(s.exists){applyCfg(clone(s.data()));if(S.loaded)afterData()}},()=>{});
+}
+async function init(){
+  let db=null;
+  if(window.claude&&typeof window.claude.use==='function'){
+    window.claude.use('downloads').then(x=>{S.dl=x}).catch(()=>{});
+    try{db=await window.claude.use('db')}catch(e){db=null}
+  }
+  if(db){S.mode='cloud';S.db=db;setSync('idle');subscribe()}
+  else{S.mode='local';loadLocal();S.loaded=true;setSync('ok');renderMain()}
+}
+
+/* ---------- Thanh trên + tab ---------- */
+function fixTab(){if(S.tab!=='lost'&&!PH[S.tab])S.tab=CFG.phases[0].id}
+function counts(){const c={lost:0};CFG.phases.forEach(p=>c[p.id]=0);Object.values(S.deals).forEach(d=>{if(d.status==='lost')c.lost++;else c[stageOf(d).phase]++});return c}
+function renderTabs(){
+  fixTab();const c=counts();
+  $('#tablist').innerHTML=CFG.phases.map(p=>'<button class="tab'+(S.tab===p.id&&!S.q?' on':'')+'" role="tab" data-tab="'+p.id+'" style="'+pcv(p)+'"><span class="dot"></span>'+esc(p.name)+'<span class="n">'+c[p.id]+'</span></button>').join('')
+    +'<button class="tab'+(S.tab==='lost'&&!S.q?' on':'')+'" role="tab" data-tab="lost" style="--pc:var(--lost)"><span class="dot"></span>Lost<span class="n">'+c.lost+'</span></button>';
+}
+function renderMain(){renderTabs();renderBoard()}
+let rmT=0;function renderMainSoon(){cancelAnimationFrame(rmT);rmT=requestAnimationFrame(renderMain)}
+
+/* ---------- Bảng ---------- */
+function sortDeals(arr){return arr.sort((a,b)=>{const ha=a[1].status==='hold'?1:0,hb=b[1].status==='hold'?1:0;if(ha!==hb)return ha-hb;return (b[1].updated||0)-(a[1].updated||0)})}
+function card(id,d,mode){
+  const s=stageOf(d),p=PH[s.phase],today=isoDay(),drag=mode==null;
+  let h='<div class="card'+(S.open===id?' sel':'')+(d.status==='hold'?' held':'')+'" role="button" tabindex="0" data-id="'+id+'"'+(drag?' draggable="true"':'')+' style="'+pcv(p)+'">';
+  h+='<span class="c-top"><span class="c-name">'+esc(d.name||'Chưa đặt tên')+'</span></span>';
+  if(mode){const ls=mode==='lost'&&d.lostStage&&SBY[d.lostStage]?SBY[d.lostStage]:s;h+='<span class="c-who">'+esc(PH[ls.phase].name+' · '+ls.name)+'</span>'}
+  if(d.contact)h+='<span class="c-who">'+esc(d.contact)+'</span>';
+  const td=mode!=='lost'&&(d.todos||[]).find(t=>!t.done);
+  if(td)h+='<span class="c-todo"><i></i><span>'+esc(td.t)+'</span></span>';
+  h+='<span class="c-foot">';
+  if(mode==='lost')h+='<span>'+esc(d.lostReason||'Lost')+(d.lostAt?' · '+dmT(d.lostAt):'')+'</span>';
+  else{
+    const n=days(d.stageAt);h+='<span>'+(n?n+' ngày':'Mới vào')+'</span>';
+    if(d.status==='hold')h+='<span class="tag hold">'+(d.holdUntil&&d.holdUntil<=today?'Đến hẹn':'Hoãn đến '+dmy(d.holdUntil))+'</span>';
+    if(d.sample)h+='<span class="tag plain">Mẫu</span>';
+  }
+  return h+'</span></div>';
+}
+function renderBoard(){
+  const el=$('#board');
+  if(!S.loaded){el.innerHTML='<p class="sub-h">Đang tải deal…</p>';return}
+  fixTab();
+  const all=Object.entries(S.deals);
+  if(S.q){
+    const q=fold(S.q);
+    const hit=sortDeals(all.filter(([,d])=>fold([d.name,d.contact,d.dmName,d.source].join(' ')).includes(q)));
+    el.innerHTML='<div class="list"><div class="sub-h">'+(hit.length?hit.length+' deal khớp “'+esc(S.q)+'”':'Không có deal nào khớp “'+esc(S.q)+'”')+'</div><div class="grid">'+hit.map(([id,d])=>card(id,d,d.status==='lost'?'lost':'find')).join('')+'</div></div>';
+    return;
+  }
+  if(S.tab==='lost'){
+    const ls=all.filter(([,d])=>d.status==='lost').sort((a,b)=>(b[1].lostAt||0)-(a[1].lostAt||0));
+    el.innerHTML='<div class="list"><div class="sub-h">Deal đã lost. Mở một deal để xem lý do hoặc mở lại.</div>'+(ls.length?'<div class="grid">'+ls.map(([id,d])=>card(id,d,'lost')).join('')+'</div>':'<p class="hint">Chưa có deal nào lost.</p>')+'</div>';
+    return;
+  }
+  const by={};all.forEach(([id,d])=>{if(d.status==='lost')return;(by[stageOf(d).id]=by[stageOf(d).id]||[]).push([id,d])});
+  const ph=PH[S.tab];
+  let h='<div class="phase" style="'+pcv(ph)+'"><span class="dot"></span><b>Phase '+esc(ph.name)+'</b>'+infoBtn('p:'+ph.id,'Ghi chú của phase')
+    +(all.length?'':'<span class="hint">Chưa có deal nào. Bấm “Deal” để thêm.</span>')+'<span class="sp"></span><button class="link" data-hact="editor">'+ic('sliders')+'Chỉnh phễu</button></div><div class="cols">';
+  h+=stagesOf(ph.id).map(st=>{
+    const items=sortDeals(by[st.id]||[]);
+    return '<section class="col'+(items.length?'':' is-empty')+'" data-st="'+st.id+'" style="'+pcv(ph)+'"><div class="col-h"><span class="col-t" title="'+esc(st.name)+'">'+esc(st.name)+'</span>'+infoBtn('s:'+st.id,'Ghi chú của '+st.name)+'<span class="col-n">'+items.length+'</span></div><div class="col-body">'
+      +(items.length?items.map(([id,d])=>card(id,d)).join(''):'<div class="col-empty">Chưa có deal</div>')+'</div></section>';
+  }).join('');
+  el.innerHTML=h+'</div>';
+}
+
+/* ---------- Bảng ghi chú (i): outcome, service, tín hiệu chuyển bước ---------- */
+const tip=$('#tip');let tipFor=null,tipPinned=false;
+function infoHTML(key){
+  const p=key.split(':'),isPhase=p[0]==='p',o=isPhase?PH[p[1]]:SBY[p[1]];if(!o)return'';
+  const sec=(label,arr,tag)=>{const a=lines(arr);return '<div class="tip-k">'+label+'</div><div class="tip-v">'+(a.length?'<'+tag+'>'+a.map(x=>'<li>'+esc(x)+'</li>').join('')+'</'+tag+'>':'<span class="muted">Chưa ghi</span>')+'</div>'};
+  let h='<div class="tip-k">Outcome</div><div class="tip-v">'+(o.outcome?esc(o.outcome):'<span class="muted">Chưa ghi</span>')+'</div>'+sec('Service',o.service,'ol');
+  if(!isPhase)h+=sec('Tín hiệu chuyển bước',o.signals,'ul');
+  return h;
+}
+function showTip(el){
+  const h=infoHTML(el.dataset.info);if(!h)return;
+  if(tipFor&&tipFor!==el)tipFor.classList.remove('on');
+  tip.innerHTML=h;tip.hidden=false;tipFor=el;el.classList.add('on');
+  const r=el.getBoundingClientRect(),tw=tip.offsetWidth,th=tip.offsetHeight;
+  const x=Math.min(Math.max(8,r.left-10),innerWidth-tw-8);let y=r.bottom+6;if(y+th>innerHeight-8)y=Math.max(8,r.top-th-6);
+  tip.style.left=x+'px';tip.style.top=y+'px';
+}
+function hideTip(){tip.hidden=true;if(tipFor)tipFor.classList.remove('on');tipFor=null;tipPinned=false}
+document.addEventListener('mouseover',e=>{if(tipPinned)return;const el=e.target.closest&&e.target.closest('[data-info]');if(el&&el!==tipFor)showTip(el)});
+document.addEventListener('mouseout',e=>{if(tipPinned||!tipFor)return;const el=e.target.closest&&e.target.closest('[data-info]');if(el===tipFor&&!el.contains(e.relatedTarget))hideTip()});
+document.addEventListener('focusin',e=>{const el=e.target.closest&&e.target.closest('[data-info]');if(el)showTip(el)});
+document.addEventListener('focusout',e=>{const el=e.target.closest&&e.target.closest('[data-info]');if(el&&el===tipFor&&!tipPinned)hideTip()});
+document.addEventListener('scroll',()=>{if(tipFor)hideTip()},true);
+
+/* ---------- Ngăn deal (khung giữ nguyên, chỉ thay nội dung → không nháy) ---------- */
+const dr=$('#drawer-root');
+function drawerBusy(){const a=document.activeElement;return a&&dr.contains(a)&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA')&&a.type!=='checkbox'}
+function openDrawer(id){
+  S.open=id;S.ui={};
+  dr.innerHTML='<div class="scrim" data-act="close"></div><aside class="drawer enter" role="dialog" aria-modal="true"><div class="d-top" id="dtop"></div><div class="d-body" id="dbody"></div></aside>';
+  const a=dr.querySelector('.drawer');a.addEventListener('animationend',()=>a.classList.remove('enter'),{once:true});
+  dr.hidden=false;renderDrawer();renderBoard();
+}
+function closeDrawer(){S.open=null;S.ui={};dr.hidden=true;dr.innerHTML='';hideTip();renderBoard()}
+function fit(el){el.style.height='auto';el.style.height=el.scrollHeight+'px'}
+const todoRow=t=>'<div class="todo'+(t.done?' done':'')+'"><input class="cb" type="checkbox" data-tk="'+t.id+'"'+(t.done?' checked':'')+' aria-label="Đánh dấu đã xong"><textarea class="todo-t" rows="1" data-tt="'+t.id+'" aria-label="Việc cần làm">'+esc(t.t)+'</textarea><button type="button" class="ib xs del" data-act="todoDel" data-v="'+t.id+'" aria-label="Xoá việc">'+ic('x')+'</button></div>';
+function stageTodos(d,s){const mine=(d.todos||[]).filter(t=>t.st===s.id);return (mine.length?mine:(d.todos||[]).filter(t=>!t.done)).map(t=>t.t.trim()).filter(Boolean)}
+function renderDrawer(){
+  const d=cur();if(!d){closeDrawer();return}
+  const top=$('#dtop'),body=$('#dbody'),aside=dr.querySelector('.drawer');if(!top||!body)return;
+  const sc=body.scrollTop,noteDraft=($('#f-note')||{}).value||'',todoDraft=($('#todo-new')||{}).value||'';
+  const s=stageOf(d),ph=PH[s.phase],nxt=nextOf(s),prv=prevOf(s),u=S.ui,today=isoDay(),lost=d.status==='lost';
+  aside.setAttribute('style',pcv(ph));aside.setAttribute('aria-label',d.name||'Deal');
+
+  if(document.activeElement!==$('#f-name')){
+    let t='<button class="ib" data-act="close" aria-label="Đóng">'+ic('x')+'</button><input class="d-name" id="f-name" data-f="name" value="'+esc(d.name)+'" placeholder="Tên công ty" aria-label="Tên công ty">';
+    if(!lost)t+='<button class="lostbtn" data-act="lost">Lost deal</button>';
+    t+='<button class="ib" data-act="menu" aria-label="Thao tác khác">'+ic('dots')+'</button>';
+    if(u.menu)t+='<div class="menu in">'+(d.status==='open'?'<button data-act="hold">'+ic('pause')+'Tạm hoãn</button>':'')+'<button class="danger" data-act="del">'+ic('trash')+'Xoá deal</button></div>';
+    top.innerHTML=t;
+  }
+
+  let b='';
+  if(d.status==='hold')b+='<div class="box warn"><div><b>'+(d.holdUntil&&d.holdUntil<=today?'Đã đến hẹn quay lại':'Tạm hoãn đến '+dmy(d.holdUntil))+'</b>'+(d.holdNote?' · '+esc(d.holdNote):'')+'</div><div class="row"><button class="btn ghost sm" data-act="resume">Tiếp tục deal</button></div></div>';
+  if(lost)b+='<div class="box bad"><div><b>Deal đã lost</b>'+(d.lostReason?' · '+esc(d.lostReason):'')+(d.lostNote?'<br>'+esc(d.lostNote):'')+'</div><div class="row"><button class="btn ghost sm" data-act="reopen">Mở lại deal</button></div></div>';
+  if(u.panel==='hold')b+='<div class="box plain"><b>Tạm hoãn đến khi nào?</b><div class="pair"><input class="fld" data-f="holdNote" value="'+esc(u.holdNote||'')+'" placeholder="Lý do, VD: khách hẹn sau Tết"><input class="fld" type="date" id="h-date" data-f="holdDate" value="'+esc(u.holdDate||'')+'" aria-label="Ngày quay lại"></div><div class="m-act"><button class="btn ghost sm" data-act="cancelPanel">Thôi</button><button class="btn pri sm" data-act="holdOk">Tạm hoãn</button></div></div>';
+  if(u.panel==='del')b+='<div class="box plain"><div>Xoá hẳn deal <b>'+esc(d.name)+'</b>? Không khôi phục được. Nếu chỉ không theo nữa, hãy chọn “Lost deal”.</div><div class="m-act"><button class="btn ghost sm" data-act="cancelPanel">Thôi</button><button class="btn danger sm" data-act="delOk">Xoá deal</button></div></div>';
+
+  b+='<div class="phases">'+CFG.phases.map(p=>'<button class="ph'+(p.id===s.phase?' on':PHI[p.id]<PHI[s.phase]?' done':'')+'" data-act="phase" data-v="'+p.id+'" style="'+pcv(p)+'"'+(lost?' disabled':'')+'>'+esc(p.name)+'</button>').join('')+'</div>';
+
+  b+='<section class="stage"><div><div class="st-k">Phase '+esc(ph.name)+'</div><div class="st-row"><h3 class="st-n">'+esc(s.name)+'</h3>'+infoBtn('s:'+s.id,'Ghi chú của bước này')+'</div></div>';
+  const todos=d.todos||[],open=todos.filter(x=>!x.done),done=todos.filter(x=>x.done),tpl=lines(s.todos);
+  b+='<div class="blk"><div class="blk-h"><span>Việc cần làm</span><span class="blk-tools">'
+    +(tpl.length?'<button class="mini" data-act="useTpl">+ Thêm từ mẫu</button>':'')
+    +(stageTodos(d,s).length?'<button class="mini" data-act="saveTpl">Lưu làm mẫu</button>':'')+'</span></div>'+open.map(todoRow).join('')
+    +'<div class="todo add"><span class="plus">+</span><input class="todo-t" id="todo-new" placeholder="Thêm việc cần làm, Enter để lưu" aria-label="Thêm việc cần làm"></div>';
+  if(done.length){b+='<button class="mini donebtn" data-act="toggleDone">'+(u.showDone?'Ẩn ':'Hiện ')+done.length+' việc đã xong</button>';if(u.showDone)b+=done.map(todoRow).join('')}
+  b+='</div>';
+  if(!lost){
+    b+='<div class="st-act">';
+    if(nxt)b+='<button class="btn pri" data-act="adv">'+esc(nxt.phase!==s.phase?'Sang phase '+PH[nxt.phase].name:'Chuyển sang: '+nxt.name)+ic('right')+'</button>';
+    if(prv)b+='<button class="link" data-act="back">'+ic('left')+'Lùi về '+esc(prv.name)+'</button>';
+    b+='</div>';
+  }
+  b+='</section>';
+
+  const entries=(d.log||[]).filter(e=>e.k==='note'||e.k==='phase').slice().reverse();
+  b+='<section><button class="sec-tg" data-act="toggleLog" aria-expanded="'+(S.logOpen?'true':'false')+'">'+ic('chev')+'Nhật ký<span class="cnt">'+entries.length+'</span></button>';
+  if(S.logOpen){
+    b+='<textarea class="note-in" id="f-note" placeholder="Ghi nhanh: khách nói gì, hẹn gì…"></textarea><div class="note-bar"><span class="hint">⌘/Ctrl + Enter để ghi</span><button class="btn ghost sm" data-act="note">Ghi</button></div><div class="log">'
+      +(entries.length?entries.map(e=>'<div class="log-i'+(e.k==='phase'?' ph':'')+'"><span class="log-d">'+dmT(e.t)+'</span><span class="log-t">'+esc(e.x)+'</span></div>').join(''):'<p class="hint">Chưa có ghi chép.</p>')+'</div>';
+  }
+  b+='</section>';
+  body.innerHTML=b;body.scrollTop=sc;
+  const fn=$('#f-note');if(fn&&noteDraft)fn.value=noteDraft;
+  const tn=$('#todo-new');if(tn&&todoDraft)tn.value=todoDraft;
+  body.querySelectorAll('textarea.todo-t').forEach(fit);
+  if(tipFor&&!tipFor.isConnected)hideTip();
+}
+
+/* ---------- Chuyển bước, chốt, lost ---------- */
+let toastT=0;
+function toast(msg,undo){
+  const el=$('#toast');el.innerHTML='<span>'+esc(msg)+'</span>'+(undo?'<button type="button" id="undo">Hoàn tác</button>':'');
+  el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{el.hidden=true},undo?6500:3600);
+  if(undo)$('#undo').onclick=()=>{el.hidden=true;undo()};
+}
+function restore(id,before){S.deals[id]=before;save(id,0);renderMain();if(S.open===id)renderDrawer()}
+function requestMove(id,to){
+  const d=S.deals[id];if(!d||d.stage===to||!SBY[to]||d.status==='lost')return;
+  moveTo(id,to);
+}
+function moveTo(id,to){
+  const d=S.deals[id];if(!d||d.stage===to)return;
+  const before=clone(d),fp=stageOf(d).phase,tp=SBY[to].phase;
+  d.stage=to;d.stageAt=Date.now();
+  if(fp!==tp)addLog(d,'phase',PH[fp].name+' → '+PH[tp].name);
+  S.ui.menu=false;S.ui.panel=null;
+  save(id,0);renderMain();if(S.open===id)renderDrawer();
+  toast('Đã chuyển sang “'+SBY[to].name+'”',()=>restore(id,before));
+}
+function openLost(id){
+  const d=S.deals[id];let reason='';
+  modal('<div class="m-h"><span class="m-t">Lost deal này?</span>'+xBtn+'</div><p class="m-p"><b>'+esc(d.name)+'</b> sẽ chuyển sang mục Lost. Bạn mở lại được bất cứ lúc nào.</p><div class="f"><span class="lb">Lý do (không bắt buộc)</span><div class="chips">'+LOST.map(r=>'<button type="button" class="chip" data-r="'+esc(r)+'">'+esc(r)+'</button>').join('')+'</div></div><div class="f"><label for="l-note">Ghi chú</label><input class="fld" id="l-note" placeholder="Không bắt buộc"></div><div class="m-act"><button type="button" class="btn ghost" data-x>Không</button><button type="button" class="btn danger" id="l-ok">Có, lost deal</button></div>');
+  mr.querySelectorAll('[data-r]').forEach(b=>b.addEventListener('click',()=>{reason=reason===b.dataset.r?'':b.dataset.r;mr.querySelectorAll('[data-r]').forEach(x=>x.classList.toggle('on',x.dataset.r===reason))}));
+  $('#l-ok').addEventListener('click',()=>{const note=$('#l-note').value.trim();closeModal();markLost(id,reason,note)});
+}
+function markLost(id,reason,note){
+  const d=S.deals[id];if(!d)return;const before=clone(d);
+  d.status='lost';d.lostReason=reason;d.lostNote=note;d.lostStage=d.stage;d.lostAt=Date.now();delete d.holdUntil;delete d.holdNote;
+  addLog(d,'phase',phaseOf(d).name+' → Lost'+(reason?' · '+reason:'')+(note?' · '+note:''));
+  S.ui={};save(id,0);renderMain();if(S.open===id)renderDrawer();
+  toast('Đã chuyển deal sang Lost',()=>restore(id,before));
+}
+function addTodo(text){const d=cur();if(!d)return;d.todos=d.todos||[];d.todos.push({id:uid(),t:text,done:false,st:d.stage,at:Date.now()})}
+function act(a,el){
+  const d=cur(),u=S.ui,v=el.dataset.v;
+  if(a==='close'){closeDrawer();return}
+  if(!d)return;
+  switch(a){
+    case'menu':u.menu=!u.menu;renderDrawer();return;
+    case'lost':openLost(S.open);return;
+    case'phase':{if(PH[v]&&v!==stageOf(d).phase)requestMove(S.open,stagesOf(v)[0].id);return}
+    case'adv':{const nx=nextOf(stageOf(d));if(nx)requestMove(S.open,nx.id);return}
+    case'back':{const pv=prevOf(stageOf(d));if(pv)requestMove(S.open,pv.id);return}
+    case'hold':S.ui={panel:'hold'};renderDrawer();{const hd=$('#h-date');if(hd)hd.focus()}return;
+    case'del':S.ui={panel:'del'};renderDrawer();return;
+    case'cancelPanel':S.ui={};renderDrawer();return;
+    case'holdOk':
+      if(!u.holdDate){toast('Chọn ngày hẹn quay lại');return}
+      d.status='hold';d.holdUntil=u.holdDate;d.holdNote=u.holdNote||'';S.ui={};save(S.open,0);renderDrawer();renderMain();return;
+    case'resume':d.status='open';delete d.holdUntil;delete d.holdNote;save(S.open,0);renderDrawer();renderMain();return;
+    case'reopen':{const pn=phaseOf(d).name;d.status='open';d.stageAt=Date.now();['lostReason','lostNote','lostStage','lostAt'].forEach(k=>delete d[k]);addLog(d,'phase','Lost → '+pn);save(S.open,0);renderDrawer();renderMain();return}
+    case'delOk':{const id=S.open,nm=d.name;delete S.deals[id];save(id,0);closeDrawer();renderMain();toast('Đã xoá deal '+(nm||''));return}
+    case'note':addNote();return;
+    case'toggleLog':S.logOpen=!S.logOpen;LS.set('cj.log',S.logOpen?'1':'0');renderDrawer();return;
+    case'toggleDone':u.showDone=!u.showDone;renderDrawer();return;
+    case'todoDel':d.todos=(d.todos||[]).filter(t=>t.id!==v);save(S.open,0);renderDrawer();renderMainSoon();return;
+    case'useTpl':{
+      const have=new Set((d.todos||[]).filter(t=>!t.done).map(t=>t.t.trim()));let n=0;
+      lines(stageOf(d).todos).forEach(x=>{if(!have.has(x)){addTodo(x);n++}});
+      if(n){save(S.open,0);renderDrawer();renderMainSoon()}
+      toast(n?'Đã thêm '+n+' việc từ mẫu. Sửa hoặc xoá tuỳ ý.':'Các việc trong mẫu đã có trong danh sách');return}
+    case'saveTpl':{
+      const s=stageOf(d),list=stageTodos(d,s);if(!list.length)return;
+      const old=(s.todos||[]).slice();s.todos=list;saveMeta('config',CFG);renderDrawer();
+      toast('Đã lưu '+list.length+' việc làm mẫu cho bước “'+s.name+'”',()=>{s.todos=old;saveMeta('config',CFG);if(S.open)renderDrawer()});return}
+  }
+}
+function addNote(){
+  const d=cur(),ta=$('#f-note');if(!d||!ta)return;
+  const x=ta.value.trim();if(!x)return;
+  addLog(d,'note',x);save(S.open,0);ta.value='';renderDrawer();
+}
+dr.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');
+  if(b&&!b.disabled){e.preventDefault();act(b.dataset.act,b);return}
+  if(S.ui.menu&&!e.target.closest('.menu')&&!e.target.closest('[data-info]')){S.ui.menu=false;renderDrawer()}
+});
+dr.addEventListener('change',e=>{
+  const t=e.target,d=cur();if(!d||!t.dataset.tk)return;
+  const td=(d.todos||[]).find(x=>x.id===t.dataset.tk);if(td){td.done=t.checked;if(t.checked)td.doneAt=Date.now();else delete td.doneAt}
+  save(S.open,0);renderDrawer();renderMainSoon();
+});
+dr.addEventListener('input',e=>{
+  const t=e.target,d=cur();if(!d)return;const u=S.ui;
+  if(t.dataset.tt){fit(t);const td=(d.todos||[]).find(x=>x.id===t.dataset.tt);if(td){td.t=t.value;save(S.open,700);renderMainSoon()}return}
+  const f=t.dataset.f;if(!f)return;
+  if(f==='holdNote'){u.holdNote=t.value;return}
+  if(f==='holdDate'){u.holdDate=t.value;return}
+  if(f==='name'){d.name=t.value;save(S.open,600);renderMainSoon()}
+});
+dr.addEventListener('keydown',e=>{
+  const t=e.target;
+  if(t.id==='f-note'&&e.key==='Enter'&&(e.metaKey||e.ctrlKey)){e.preventDefault();addNote();return}
+  if(e.key!=='Enter'||e.isComposing)return;
+  if(t.id==='todo-new'){e.preventDefault();const x=t.value.trim();if(!x)return;addTodo(x);t.value='';save(S.open,0);renderDrawer();renderMainSoon();const n=$('#todo-new');if(n)n.focus();return}
+  if(t.dataset.tt){e.preventDefault();const n=$('#todo-new');if(n)n.focus()}
+});
+dr.addEventListener('focusout',e=>{
+  const t=e.target;if(!t.dataset||!t.dataset.tt||!t.isConnected)return;
+  if(t.value.trim())return;
+  const d=cur();if(!d)return;d.todos=(d.todos||[]).filter(x=>x.id!==t.dataset.tt);save(S.open,0);setTimeout(()=>{if(S.open)renderDrawer();renderMainSoon()},0);
+});
+
+/* ---------- Hộp thoại ---------- */
+const mr=$('#modal-root');
+let ED=null;
+function closeModal(){mr.innerHTML='';ED=null}
+function modal(html,wide){mr.innerHTML='<div class="modal-wrap" data-mclose><div class="modal'+(wide?' wide':'')+'" role="dialog" aria-modal="true">'+html+'</div></div>'}
+mr.addEventListener('click',e=>{if(e.target.hasAttribute('data-mclose')||e.target.closest('[data-x]'))closeModal()});
+const xBtn='<button type="button" class="ib" data-x aria-label="Đóng">'+ic('x')+'</button>';
+
+function openNew(){
+  let start=null;
+  modal('<form id="newForm" style="display:contents"><div class="m-h"><span class="m-t">Deal mới</span>'+xBtn+'</div>'
+    +'<div class="f"><label for="n-name">Công ty</label><input class="fld" id="n-name" required placeholder="Tên doanh nghiệp" autocomplete="off"></div>'
+    +'<div class="f"><label for="n-contact">Người bạn vừa nói chuyện</label><input class="fld" id="n-contact" placeholder="VD: chị Hương, Trưởng phòng HC" autocomplete="off"></div>'
+    +'<div class="f"><span class="lb">Bắt đầu ở phase</span><div class="choice">'
+    +CFG.phases.map(p=>'<button type="button" data-start="'+p.id+'" style="'+pcv(p)+'"><b>'+esc(p.name)+'</b><span>Bước đầu: '+esc(stagesOf(p.id)[0].name)+'</span></button>').join('')
+    +'</div><p class="hint" id="n-hint">Chọn phase đúng với người bạn vừa nói chuyện.</p></div>'
+    +'<div class="m-act"><button type="button" class="btn ghost" data-x>Thôi</button><button class="btn pri" type="submit">Tạo deal</button></div></form>');
+  const f=$('#newForm');
+  f.querySelectorAll('[data-start]').forEach(b=>b.addEventListener('click',()=>{start=b.dataset.start;f.querySelectorAll('[data-start]').forEach(x=>x.classList.toggle('on',x===b));$('#n-hint').classList.remove('err')}));
+  f.addEventListener('submit',e=>{
+    e.preventDefault();
+    const name=$('#n-name').value.trim();if(!name){$('#n-name').focus();return}
+    if(!start||!PH[start]){const h=$('#n-hint');h.textContent='Chọn phase để deal vào đúng bước.';h.classList.add('err');return}
+    const id=uid(),st=stagesOf(start)[0].id,now=Date.now();
+    S.deals[id]={name:name,contact:$('#n-contact').value.trim(),role:start,value:null,stage:st,status:'open',stageAt:now,created:now,updated:now,todos:[],log:[]};
+    save(id,0);closeModal();
+    S.tab=start;LS.set('cj.tab',S.tab);S.q='';$('#qs').value='';
+    renderMain();openDrawer(id);
+  });
+  setTimeout(()=>{const n=$('#n-name');if(n)n.focus()},30);
+}
+
+/* ---------- Chỉnh phễu: phase và stage thêm/bớt/sắp xếp được ---------- */
+function openEditor(){ED={draft:clone(CFG),open:new Set(),err:{}};renderEditor()}
+const dealsIn=pred=>Object.values(S.deals).filter(d=>pred(d.stage)).length;
+function renderEditor(focusSel){
+  if(!ED)return;
+  const old=mr.querySelector('.modal'),sc=old?old.scrollTop:0,dft=ED.draft,np=dft.phases.length;
+  let h='<div class="m-h"><span class="m-t">Chỉnh phễu</span>'+xBtn+'</div><p class="hint">Sửa phase và stage. Trong các ô nhiều dòng, mỗi dòng là một mục. Outcome, Service và Tín hiệu chuyển bước hiện trong nút (i); To-do mẫu dùng cho nút “Thêm từ mẫu”.</p><div class="ed">';
+  dft.phases.forEach((p,pi)=>{
+    const sts=dft.stages.filter(s=>s.phase===p.id);
+    h+='<section class="ed-ph" style="'+pcv(p)+'"><div class="ed-ph-h"><span class="dot"></span><input class="fld" data-e="pname" data-p="'+p.id+'" value="'+esc(p.name)+'" aria-label="Tên phase"><span class="sp"></span>'
+      +'<button type="button" class="ib xs" data-ed="pup" data-p="'+p.id+'"'+(pi===0?' disabled':'')+' aria-label="Đưa phase lên">'+ic('upc')+'</button>'
+      +'<button type="button" class="ib xs" data-ed="pdown" data-p="'+p.id+'"'+(pi===np-1?' disabled':'')+' aria-label="Đưa phase xuống">'+ic('downc')+'</button>'
+      +'<button type="button" class="ib xs" data-ed="pdel" data-p="'+p.id+'" aria-label="Xoá phase">'+ic('trash')+'</button></div>'
+      +(ED.err['p:'+p.id]?'<p class="hint err">'+esc(ED.err['p:'+p.id])+'</p>':'')
+      +'<div class="ed-grid">'
+      +'<label>Outcome của phase</label><input class="fld" data-e="poutcome" data-p="'+p.id+'" value="'+esc(p.outcome)+'">'
+      +'<label>Service của phase</label><textarea class="fld" rows="3" data-e="pservice" data-p="'+p.id+'">'+esc((p.service||[]).join('\n'))+'</textarea>'
+      +'</div><div class="ed-sts">';
+    sts.forEach((s,i)=>{
+      const n=dealsIn(st=>st===s.id);
+      h+='<details class="ed-st" data-s="'+s.id+'"'+(ED.open.has(s.id)?' open':'')+'><summary><span class="ed-st-t">'+esc(s.name||'Bước mới')+'</span>'+(n?'<span class="cnt">'+n+' deal</span>':'')+'<span class="sp"></span>'
+        +'<button type="button" class="ib xs" data-ed="up" data-s="'+s.id+'"'+(i===0?' disabled':'')+' aria-label="Đưa stage lên">'+ic('upc')+'</button>'
+        +'<button type="button" class="ib xs" data-ed="down" data-s="'+s.id+'"'+(i===sts.length-1?' disabled':'')+' aria-label="Đưa stage xuống">'+ic('downc')+'</button>'
+        +'<button type="button" class="ib xs" data-ed="del" data-s="'+s.id+'" aria-label="Xoá stage">'+ic('trash')+'</button></summary>'
+        +(ED.err[s.id]?'<p class="hint err">'+esc(ED.err[s.id])+'</p>':'')
+        +'<div class="ed-grid"><label>Tên stage</label><input class="fld" data-e="sname" data-s="'+s.id+'" value="'+esc(s.name)+'">'
+        +'<label>Outcome</label><input class="fld" data-e="soutcome" data-s="'+s.id+'" value="'+esc(s.outcome)+'">'
+        +'<label>Service</label><textarea class="fld" rows="4" data-e="sservice" data-s="'+s.id+'">'+esc((s.service||[]).join('\n'))+'</textarea>'
+        +'<label>Tín hiệu chuyển bước</label><textarea class="fld" rows="3" data-e="ssignals" data-s="'+s.id+'">'+esc((s.signals||[]).join('\n'))+'</textarea>'
+        +'<label>To-do mẫu</label><textarea class="fld" rows="3" data-e="stodos" data-s="'+s.id+'">'+esc((s.todos||[]).join('\n'))+'</textarea></div></details>';
+    });
+    h+='<button type="button" class="link" data-ed="add" data-p="'+p.id+'">'+ic('plus')+'Thêm stage</button></div></section>';
+  });
+  h+='<button type="button" class="link" data-ed="padd">'+ic('plus')+'Thêm phase</button></div><div class="m-act m-foot"><button type="button" class="btn ghost" data-x>Thôi</button><button type="button" class="btn pri" data-ed="save">Lưu thay đổi</button></div>';
+  if(!old)modal(h,true);else{old.innerHTML=h;old.scrollTop=sc}
+  if(focusSel){const f=mr.querySelector(focusSel);if(f)f.focus()}
+}
+mr.addEventListener('input',e=>{
+  if(!ED)return;const t=e.target,k=t.dataset.e;if(!k)return;const dft=ED.draft;
+  if(t.dataset.p){const p=dft.phases.find(x=>x.id===t.dataset.p);if(!p)return;
+    if(k==='pname')p.name=t.value;else if(k==='poutcome')p.outcome=t.value;else if(k==='pservice')p.service=t.value.split('\n');return}
+  const s=dft.stages.find(x=>x.id===t.dataset.s);if(!s)return;
+  if(k==='sname'){s.name=t.value;const sum=mr.querySelector('.ed-st[data-s="'+s.id+'"] .ed-st-t');if(sum)sum.textContent=t.value||'Bước mới'}
+  else if(k==='soutcome')s.outcome=t.value;else if(k==='sservice')s.service=t.value.split('\n');else if(k==='ssignals')s.signals=t.value.split('\n');else if(k==='stodos')s.todos=t.value.split('\n');
+});
+mr.addEventListener('toggle',e=>{if(!ED)return;const el=e.target;if(el.classList&&el.classList.contains('ed-st')){if(el.open)ED.open.add(el.dataset.s);else ED.open.delete(el.dataset.s)}},true);
+mr.addEventListener('click',e=>{
+  const b=e.target.closest('[data-ed]');if(!b||!ED)return;e.preventDefault();if(b.disabled)return;
+  const a=b.dataset.ed,dft=ED.draft;
+  if(a==='save'){saveEditor();return}
+  if(a==='padd'){
+    const used=new Set(dft.phases.map(p=>p.color)),pid='p'+uid(),sid='s'+uid();
+    dft.phases.push({id:pid,name:'Phase mới',color:nextColor(used),outcome:'',service:[]});
+    dft.stages.push({id:sid,phase:pid,name:'Bước mới',outcome:'',service:[],signals:[],todos:[]});
+    renderEditor('[data-e="pname"][data-p="'+pid+'"]');{const n=mr.querySelector('[data-e="pname"][data-p="'+pid+'"]');if(n)n.select()}return}
+  if(a==='add'){const id='s'+uid();dft.stages.push({id:id,phase:b.dataset.p,name:'Bước mới',outcome:'',service:[],signals:[],todos:[]});ED.open.add(id);renderEditor('[data-e="sname"][data-s="'+id+'"]');{const n=mr.querySelector('[data-e="sname"][data-s="'+id+'"]');if(n)n.select()}return}
+  if(b.dataset.p&&!b.dataset.s&&a!=='add'){
+    const p=dft.phases.find(x=>x.id===b.dataset.p);if(!p)return;const pi=dft.phases.indexOf(p);
+    if(a==='pup'||a==='pdown'){const j=a==='pup'?pi-1:pi+1;if(j<0||j>=dft.phases.length)return;dft.phases[pi]=dft.phases[j];dft.phases[j]=p;renderEditor();return}
+    if(a==='pdel'){
+      const ids=new Set(dft.stages.filter(s=>s.phase===p.id).map(s=>s.id)),n=dealsIn(st=>ids.has(st));
+      if(n){ED.err['p:'+p.id]='Còn '+n+' deal trong phase này (kể cả deal lost). Chuyển các deal sang phase khác trước khi xoá.';renderEditor();return}
+      if(dft.phases.length<2){ED.err['p:'+p.id]='Phễu cần ít nhất một phase.';renderEditor();return}
+      dft.phases=dft.phases.filter(x=>x!==p);dft.stages=dft.stages.filter(s=>s.phase!==p.id);delete ED.err['p:'+p.id];renderEditor();return}
+    return;
+  }
+  const s=dft.stages.find(x=>x.id===b.dataset.s);if(!s)return;
+  const same=dft.stages.filter(x=>x.phase===s.phase),i=same.indexOf(s);
+  if(a==='del'){
+    const n=dealsIn(st=>st===s.id);
+    if(n){ED.err[s.id]='Còn '+n+' deal ở bước này (kể cả deal lost). Chuyển các deal sang bước khác trước khi xoá.';ED.open.add(s.id);renderEditor();return}
+    if(same.length<2){ED.err[s.id]='Mỗi phase cần ít nhất một stage. Muốn bỏ hẳn thì xoá phase.';ED.open.add(s.id);renderEditor();return}
+    dft.stages=dft.stages.filter(x=>x!==s);delete ED.err[s.id];ED.open.delete(s.id);renderEditor();return}
+  if(a==='up'||a==='down'){
+    const j=a==='up'?i-1:i+1;if(j<0||j>=same.length)return;
+    const o=same[j],ai=dft.stages.indexOf(s),bi=dft.stages.indexOf(o);dft.stages[ai]=o;dft.stages[bi]=s;renderEditor();return}
+});
+function saveEditor(){
+  const dft=ED.draft;
+  dft.phases.forEach(p=>{p.name=String(p.name||'').trim()||'Phase';p.outcome=String(p.outcome||'').trim();p.service=lines(p.service)});
+  dft.stages.forEach(s=>{s.name=String(s.name||'').trim()||'Bước mới';s.outcome=String(s.outcome||'').trim();s.service=lines(s.service);s.signals=lines(s.signals);s.todos=lines(s.todos)});
+  applyCfg(dft);saveMeta('config',CFG);closeModal();renderMain();if(S.open)renderDrawer();toast('Đã lưu phễu');
+}
+
+/* ---------- Menu thanh trên, sao lưu ---------- */
+const hm=$('#hmenu-root');
+function openHMenu(btn){
+  if(hm.innerHTML){hm.innerHTML='';return}
+  const r=btn.getBoundingClientRect(),hasSample=Object.values(S.deals).some(d=>d.sample);
+  hm.innerHTML='<div class="menu" style="top:'+(r.bottom+6)+'px;right:'+Math.max(8,innerWidth-r.right)+'px">'
+    +'<button data-hact="editor">'+ic('sliders')+'Chỉnh phễu</button><hr>'
+    +'<button data-hact="backup">'+ic('down')+'Sao lưu dữ liệu</button><button data-hact="import">'+ic('up')+'Nhập bản sao lưu</button>'
+    +(hasSample?'<hr><button class="danger" data-hact="clearSample">'+ic('trash')+'Xoá deal mẫu</button>':'')+'</div>';
+}
+async function backup(){
+  const data=JSON.stringify({app:'consulting-journey',v:3,exported:new Date().toISOString(),deals:S.deals,cfg:CFG},null,1);
+  const name='consulting-sales-journey-'+isoDay()+'.json';
+  if(S.dl){try{await S.dl.save({filename:name,data:data});return}catch(e){if(e&&(e.code==='declined'||e.code==='rate_limited'))return}}
+  if(!window.claude){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:'application/json'}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);return}
+  try{await navigator.clipboard.writeText(data);toast('Đã chép bản sao lưu vào bộ nhớ tạm. Dán vào một file .json để giữ.')}catch(e){toast('Khung này không cho tải file. Mở artifact trong tab riêng rồi thử lại.')}
+}
+$('#imp').addEventListener('change',async e=>{
+  const file=e.target.files&&e.target.files[0];e.target.value='';if(!file)return;
+  let o;try{o=JSON.parse(await file.text())}catch(err){toast('File không đọc được. Chọn đúng file sao lưu .json.');return}
+  if(!o||(o.app!=='consulting-journey'&&o.app!=='dan-loi')||!o.deals){toast('Đây không phải file sao lưu của Consulting Sales Journey.');return}
+  if(o.cfg){applyCfg(clone(o.cfg));await saveMeta('config',CFG)}
+  let n=0;
+  for(const id of Object.keys(o.deals)){const inc=norm(o.deals[id]),mine=S.deals[id];
+    if(!mine||(inc.updated||0)>(mine.updated||0)){S.deals[id]=inc;dirty.add(id);try{await flush(id)}catch(err){}n++}}
+  renderMain();toast(n?'Đã gộp '+n+' deal từ bản sao lưu':'Không có gì mới trong bản sao lưu');
+});
+async function clearSample(){
+  const ids=Object.keys(S.deals).filter(id=>S.deals[id].sample);
+  for(const id of ids){delete S.deals[id];dirty.add(id);try{await flush(id)}catch(e){}}
+  if(S.open&&!S.deals[S.open])closeDrawer();renderMain();toast('Đã xoá '+ids.length+' deal mẫu');
+}
+document.addEventListener('click',e=>{
+  const inf=e.target.closest('[data-info]');
+  if(inf){e.preventDefault();if(tipPinned&&tipFor===inf)hideTip();else{showTip(inf);tipPinned=true}return}
+  if(tipPinned)hideTip();
+  const b=e.target.closest('[data-hact]');
+  if(!b){if(hm.innerHTML&&!e.target.closest('.menu'))hm.innerHTML='';return}
+  const a=b.dataset.hact;if(a!=='menu')hm.innerHTML='';
+  if(a==='menu')openHMenu(b);
+  else if(a==='new')openNew();
+  else if(a==='editor')openEditor();
+  else if(a==='backup')backup();
+  else if(a==='import')$('#imp').click();
+  else if(a==='clearSample')clearSample();
+});
+
+/* ---------- Bảng: mở deal, kéo thả giữa các làn ---------- */
+const bd=$('#board');
+$('#tablist').addEventListener('click',e=>{const t=e.target.closest('[data-tab]');if(!t)return;S.tab=t.dataset.tab;LS.set('cj.tab',S.tab);S.q='';$('#qs').value='';renderTabs();renderBoard()});
+bd.addEventListener('click',e=>{if(e.target.closest('[data-info]'))return;const c=e.target.closest('.card[data-id]');if(c)openDrawer(c.dataset.id)});
+bd.addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;const c=e.target.closest('.card[data-id]');if(c&&e.target===c){e.preventDefault();openDrawer(c.dataset.id)}});
+bd.addEventListener('dragstart',e=>{const c=e.target.closest('.card[data-id]');if(!c)return;S.dragId=c.dataset.id;try{e.dataTransfer.setData('text/plain',c.dataset.id);e.dataTransfer.effectAllowed='move'}catch(err){}c.classList.add('dragging');hideTip()});
+bd.addEventListener('dragend',()=>{S.dragId=null;bd.querySelectorAll('.dragging,.drop').forEach(x=>x.classList.remove('dragging','drop'))});
+bd.addEventListener('dragover',e=>{if(!S.dragId)return;const col=e.target.closest('.col[data-st]');if(!col)return;e.preventDefault();try{e.dataTransfer.dropEffect='move'}catch(err){}if(!col.classList.contains('drop')){bd.querySelectorAll('.col.drop').forEach(x=>x.classList.remove('drop'));col.classList.add('drop')}});
+bd.addEventListener('dragleave',e=>{const col=e.target.closest('.col[data-st]');if(col&&!col.contains(e.relatedTarget))col.classList.remove('drop')});
+bd.addEventListener('drop',e=>{const col=e.target.closest('.col[data-st]');if(!col||!S.dragId)return;e.preventDefault();const id=S.dragId;S.dragId=null;col.classList.remove('drop');requestMove(id,col.dataset.st)});
+$('#qs').addEventListener('input',e=>{S.q=e.target.value.trim();renderTabs();renderBoard()});
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape')return;
+  if(tipFor){hideTip();return}
+  if(mr.innerHTML){closeModal();return}
+  if(hm.innerHTML){hm.innerHTML='';return}
+  if(S.open){if(S.ui.menu||S.ui.panel){S.ui={};renderDrawer()}else closeDrawer()}
+});
+
+renderTabs();
+init();
+})();
+</script>
